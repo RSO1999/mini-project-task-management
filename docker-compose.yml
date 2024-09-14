@@ -1,0 +1,20 @@
+services:
+
+  database:
+    image: postgres
+    container_name: postgres-container-MP1
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=Team5isTheBest
+    ports:
+      - "8001:5432"
+
+  django:
+    build: .
+    container_name: django-container-MP1
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+    depends_on:
+      - database
