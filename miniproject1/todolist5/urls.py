@@ -9,7 +9,6 @@ urlpatterns = [
     path('add/', AddTodoItemView.as_view(), name='add_todo_item'),
     path('delete-items/', views.delete_todo_item, name='delete_todo_item'),
     path('confirm-bulk-delete/',views.BulkDeleteTodoView.as_view(), name='confirm_bulk_delete'),
-]
     path("", views.home, name="home"),
     path("register/", views.register, name="register"),
     path("login/", auth_views.LoginView.as_view(template_name="login.html", redirect_authenticated_user=True, next_page="profile"), name="login"),
