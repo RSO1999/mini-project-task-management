@@ -15,14 +15,14 @@
   <button type="submit" onclick="confirmDelete()">Delete Selected Items</button>
 </form>
 
-<a href="{% url 'home' %}">Back to Home</a>
+<a href="{% url 'todo_page' %}">Back to Todo Page</a>
 
 <script>
   function confirmDelete() {
         const checkedBoxes = document.querySelectorAll('input[name="todo_ids"]:checked');
 
         if (checkedBoxes.length === 0) {
-            alert("Please select at least one item to delete.");
+            alert("No items selected.");
             return;
         }
 

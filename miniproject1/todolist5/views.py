@@ -13,11 +13,14 @@ def home(request):
     todos = TodoItem.objects.all()
     return render(request, "home.html", {'todos': todos})
 
+def todo_page(request):
+    todos = TodoItem.objects.all()
+    return render(request, 'todo_page.html', {'todos':todos})
     
 class AddTodoItemView(FormView):
     template_name = 'add_todo_item.html'
     form_class = TodoItemForm 
-    success_url = reverse_lazy('home')
+    success_url = reverse_lazy('todo_page')
 
     def form_valid(self, form):
         todo_item = form.save(commit=False)  
