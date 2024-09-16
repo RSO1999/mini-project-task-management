@@ -15,7 +15,6 @@ urlpatterns = [
     path('add/', AddTodoItemView.as_view(), name='add_todo_item'),
     path('delete-items/', views.delete_todo_item, name='delete_todo_item'),
     path('confirm-bulk-delete/',views.BulkDeleteTodoView.as_view(), name='confirm_bulk_delete'),
-    path("", views.home, name="home"),
     path("register/", views.register, name="register"),
     path("login/", views.todo_login, name="login"),
     path("logout/", auth_views.LogoutView.as_view(next_page="login"), name="logout"),

@@ -16,10 +16,10 @@ class TodoItem(models.Model):
         ('H', 'High'),
     ]
     
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,null=False)
     
     title = models.CharField(max_length=50, null=False, blank=False, default="My Task")
-    description = models.TextField(max_length=500, null=True, blank=True)
+    description = models.TextField(max_length=500, null=True, blank=True, default='')
     completed = models.BooleanField(default=False)
     due_date = models.DateField(default=datetime.date.today)
     priority = models.CharField(max_length=10, choices=LEVEL_CHOICES, default='M')
