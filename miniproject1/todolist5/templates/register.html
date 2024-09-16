@@ -3,9 +3,31 @@
 {% block content %}
 <table>
   <h1>Create an account</h1>
-  <form method="post" action="{% url 'register' %}">
-      {% csrf_token %}
-      {{form}}
+  <div>
+    <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
+  </div>
+  {% if messages %}
+    {% for message in messages %}
+      {% if message.tags == 'error'%}
+      <div class="alert alert-danger" role="alert">
+        {{ message }}
+      </div>
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+  <form method="post" action="{% url 'register' %}">{% csrf_token %}
+    <div class="mb-3">
+      {{form.email}}
+    </div>
+    <div class="mb-3">
+      {{form.username}}
+    </div>
+    <div class="mb-3">
+      {{form.password1}}
+    </div>
+    <div class="mb-3">
+      {{form.password2}}
+    </div>
     <button type="submit" class="btn btn-primary">Create Account</button>
   </form>
 </table>
