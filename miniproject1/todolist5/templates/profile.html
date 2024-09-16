@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %} Profile {% endblock %}
+{% block content %}
+<h1>Profile Page</h1>
+{% if request.user.is_authenticated %}
+    <p>Welcome, {{ request.user.username }}!</p>
+    <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit">Logout</button>
+    </form>
+{% endif %}
+{% endblock %}

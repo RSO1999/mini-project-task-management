@@ -6,9 +6,14 @@ from django.urls import reverse_lazy
 from django.views.generic.edit import FormView, DeleteView
 from django.views import View
 
+from django.shortcuts import redirect, render, HttpResponse
+from django.core.mail import send_mail
+from .forms import AccountRegistration
 # Create your views here.
 
 
+
+    
 def home(request):
     todos = TodoItem.objects.all()
     return render(request, "home.html", {'todos': todos})
