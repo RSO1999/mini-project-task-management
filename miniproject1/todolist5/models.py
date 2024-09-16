@@ -3,6 +3,17 @@ from django.db import models
 from django.contrib.auth.models import User
 import datetime
 from django.urls import reverse
+from django.db import models
+from django.contrib.auth.models import AbstractUser
+import datetime
+from django.conf import settings
+
+
+class TodoUser(AbstractUser):
+    email = models.EmailField(unique=True)
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
 
 
 class TodoItem(models.Model):
@@ -13,7 +24,7 @@ class TodoItem(models.Model):
     ]
 
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, null=True, blank=True)  # FOREIGN KEY
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)  # FOREIGN KEY
 
     title = models.CharField(max_length=50, null=False,
                              blank=False, default="My Task")
