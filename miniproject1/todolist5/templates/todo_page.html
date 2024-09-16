@@ -1,0 +1,31 @@
+<h1> To-Do List</h1>
+
+<ul>
+    {% if todos %}
+        {% for todo in todos %}
+            <li>{{ todo.title }} - {{ todo.due_date }} - {{todo.priority}} - 
+                {% if todo.completed %} 
+                    <span style="color: green;">Completed</span>
+                {% else %}
+                    <span style="color: red;">Not Completed</span>
+                {% endif %}
+            </li>
+        {% endfor %}
+    {% else %}
+        <li>No tasks</li>
+    {% endif %}
+</ul>
+
+<style>
+  .btn{
+    background-color: grey;
+    color:white;
+    border: none;
+    border-radius: 7px;
+  }
+</style>
+<a href="{% url 'add_todo_item' %}" class="btn">Add To-Do Item</a>
+<a href="{% url 'delete_todo_item'%}" class="btn">Delete Item</a>
+
+
+
