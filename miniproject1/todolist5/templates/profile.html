@@ -4,9 +4,14 @@
 <h1>Profile Page</h1>
 {% if request.user.is_authenticated %}
     <p>Welcome, {{ request.user.username }}!</p>
+    <a href="{% url 'todo_page' %}">Go to Todo Page</a> 
+    <a href="{% url 'home' %}">Go to Home Page</a> 
     <form method="post" action="{% url 'logout' %}">
         {% csrf_token %}
         <button type="submit">Logout</button>
     </form>
+
+    
 {% endif %}
+
 {% endblock %}

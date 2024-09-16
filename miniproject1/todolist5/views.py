@@ -8,8 +8,7 @@ from django.views import View
 from django.core.mail import send_mail
 from .forms import AccountRegistration
 # Create your views here.
-
-    
+  
 def home(request):
     todos = TodoItem.objects.all()
     return render(request, "home.html", {'todos': todos})

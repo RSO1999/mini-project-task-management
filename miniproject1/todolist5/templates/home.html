@@ -8,6 +8,8 @@
     <p>{{ request.user }}</p>
     <form method="post" action="{% url 'logout' %}">
         {% csrf_token %}
+        <a href="{% url 'todo_page' %}">Go to Todo Page</a> 
+        <a href="{% url 'profile' %}">Go to Profile Page</a> 
         <button type="submit">Logout</button>
     </form>
 {% else %}
@@ -16,7 +18,7 @@
         <a href="{% url 'register' %}">Register</a>
     </nav>
 {% endif %}
-<a href="{% url 'todo_page' %}">Go to Todo Page</a>
+
 {% endblock %}
 
 {% block footer %}
