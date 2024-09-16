@@ -12,12 +12,11 @@
     <title>Home</title>
 </head>
 <body>
-    <h1>Welcome to the Homepage</h1>
     <a href="{% url 'todo_page' %}">Go to Todo Page</a>
 </body>
 </html>
 
-{% endblock %}
+
 <h1>Group 5 Todo  Project</h1>
 {% if request.user.is_authenticated %}
     <p>{{request.user}}<p>

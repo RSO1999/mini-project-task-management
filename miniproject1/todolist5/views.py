@@ -5,13 +5,9 @@ from .forms import TodoItemForm
 from django.urls import reverse_lazy
 from django.views.generic.edit import FormView, DeleteView
 from django.views import View
-
-from django.shortcuts import redirect, render, HttpResponse
 from django.core.mail import send_mail
 from .forms import AccountRegistration
 # Create your views here.
-
-
 
     
 def home(request):
@@ -49,3 +45,23 @@ class BulkDeleteTodoView(View):
         return redirect(self.success_url)
         
         return render(request, self.template_name, {'todo_ids': selected_items})
+    
+def register(request):
+    if request.method == "POST":
+        form = AccountRegistration(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data.get('email')
+            form.save()
+            # send_mail(
+            #     'Welcome to the Group 5 Todo App',
+            #     'Thank you for registering with us!',
+            #     "{insert your email here}",
+            #     [email],
+            #     fail_silently=False,
+            # )
+            return redirect("/login/")
+    form = AccountRegistration()
+    return render(request, "register.html", {"form": form})
+
+def profile(request):
+    return render(request, "profile.html")
