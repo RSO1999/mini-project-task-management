@@ -1,35 +1,23 @@
 {% extends "base.html" %}
 
-{% block title %} Welcome To The Home Page {% endblock %}
+{% block title %}Welcome To The Home Page{% endblock %}
 
 {% block content %}
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
-</head>
-<body>
-    <a href="{% url 'todo_page' %}">Go to Todo Page</a>
-</body>
-</html>
-
-
-<h1>Group 5 Todo  Project</h1>
+<h1>Group 5 Todo Project</h1>
 {% if request.user.is_authenticated %}
-    <p>{{request.user}}<p>
+    <p>{{ request.user }}</p>
     <form method="post" action="{% url 'logout' %}">
         {% csrf_token %}
         <button type="submit">Logout</button>
     </form>
 {% else %}
     <nav>
-        <a href="/login">Login</a>
-        <a href="/register">Register</a>
+        <a href="{% url 'login' %}">Login</a>
+        <a href="{% url 'register' %}">Register</a>
     </nav>
 {% endif %}
+<a href="{% url 'todo_page' %}">Go to Todo Page</a>
 {% endblock %}
+
 {% block footer %}
-{%endblock%}
+{% endblock %}
