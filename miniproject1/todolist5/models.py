@@ -1,6 +1,13 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 import datetime
+from django.conf import settings
+
+class TodoUser(AbstractUser):
+    email = models.EmailField(unique=True)
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
 
 class TodoItem(models.Model):
     LEVEL_CHOICES = [
@@ -9,7 +16,7 @@ class TodoItem(models.Model):
         ('H', 'High'),
     ]
     
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True) #FOREIGN KEY
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     
     title = models.CharField(max_length=50, null=False, blank=False, default="My Task")
     description = models.TextField(max_length=500, null=True, blank=True)
@@ -22,3 +29,4 @@ class TodoItem(models.Model):
     
     class Meta:
         ordering=['due_date']
+
