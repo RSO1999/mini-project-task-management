@@ -4,10 +4,12 @@
 
 {% block content %}
   <h2>Edit To-Do Item</h2>
+  <!--submits data to server-->
   <form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
+    {{form}}
     <button type="submit">Save changes</button>
+    
   </form>
   <a href="{% url 'home' %}">Back to list</a>
 {% endblock %}

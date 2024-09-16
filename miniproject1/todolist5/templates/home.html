@@ -1,10 +1,29 @@
-<h1>To Do List</h1>
-<ul>
+{% extends "base.html" %}
+
+{% block title %}To Do List{% endblock %}
+
+{% block content %}
+  <h1>To Do List</h1>
+  
+  <!-- buttons -->
+  <div class="btn-group mb-3">
+    <a href="?sort=due_date" class="btn btn-primary {% if sort_by == 'due_date' %}active{% endif %}">Sort by Due Date</a>
+    <a href="?sort=priority" class="btn btn-secondary {% if sort_by == 'priority' %}active{% endif %}">Sort by Priority</a>
+  </div>
+
+  <ul>
     {% for todo in todos %}
     <li>
-        {{ todo.title }} - {{ todo.due_date }} - {{ todo.priority }} - 
-        {% if todo.completed %}Completed{% else %}Not Completed{% endif %}
-        <a href="{% url 'edit_todo' todo.id %}">Edit</a> 
+      <!-- Strikethrough if complete == true-->
+      <span style = "{% if todo.completed %}text-decoration: line-through;{% endif %}">
+        {{ todo.title }}
+      </span>
+      - Due: {{ todo.due_date }} --- Priority: {{ todo.get_priority_display }} - 
+      {% if todo.completed %}Completed{% else %}Not Completed{% endif %}
+      <a href="{% url 'edit_todo' todo.id %}" class="btn btn-sm btn-link">Edit</a>
     </li>
+    {% empty %}
+    <li>No tasks.</li>
     {% endfor %}
-</ul>
+  </ul>
+{% endblock %}
