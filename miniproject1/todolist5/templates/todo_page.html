@@ -15,16 +15,15 @@
     <button class="btn btn-outline-success" type="submit">Search</button>
 </form>
 
-<div>
+<div class="todo-grid">
     {% if todos %}
         {% for todo in todos %}
-            <div class="card" style="width: 18rem;">
+            <div class="card sticky-note" style="background-color: {% cycle '#fdfd96' '#ffb6b9' '#d4f1f4' '#ffcc99' %};">
                 <div class="card-body">
                     <h5 class="card-title">{{ todo.title }}</h5>
-                    <h6 class="card-subtitle mb-2 text-body-secondary">{{todo.due_date}} - {{todo.priority}}</h6>
+                    <h6 class="card-subtitle mb-2 text-body-secondary">{{ todo.due_date }} - {{ todo.priority }}</h6>
                     <p class="card-text">{{ todo.description }}</p>
                     <a href="{% url 'edit_todo' todo.id %}">Edit</a>
-                    <!--added edit button-->
                     {% if todo.completed %}
                         <span style="color: green;">Completed</span>
                     {% else %}
@@ -42,14 +41,38 @@
     <p>You need to be logged in to view your todo items.</p>
 {% endif %}
 
-<style>
-.btn {
-  background-color: grey;
-  color: white;
-  border: none;
-  border-radius: 7px;
-}
-</style>
 <a href="{% url 'add_todo_item' %}" class="btn">Add To-Do Item</a>
-<a href="{% url 'delete_todo_item'%}" class="btn">Delete Item</a>
+<a href="{% url 'delete_todo_item' %}" class="btn">Delete Item</a>
+
+<style>
+  /* grid */
+  .todo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px; 
+    padding: 20px;
+  }
+
+  /* sticky note */
+  .sticky-note {
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ccc;
+    transition: transform 0.2s ease;
+    min-height: 200px;
+  }
+
+  .sticky-note:hover {
+    transform: translateY(-5px);
+  }
+
+  /* button styling */
+  .btn {
+    background-color: grey;
+    color: white;
+    border: none;
+    border-radius: 7px;
+  }
+</style>
 {% endblock %}
