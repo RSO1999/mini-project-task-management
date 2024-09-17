@@ -3,40 +3,47 @@
 {% block content %}
 <h1>Todo Page</h1>
 {% if request.user.is_authenticated %}
-<form class="d-flex justify-content-end" role="search" method="POST"> {% csrf_token %}
-    <div class="">
-        <input class="form-control me-2" type="search" placeholder="Search Your Todos" aria-label="Search" name="todo_search">
-        <button class="btn btn-outline-success" type="submit">Search</button>
-    </div>
+
+<div class="btn-group mb-3">
+  <a href="?sort=due_date" class="btn btn-primary {% if sort_by == 'due_date' %}active{% endif %}">Sort by Due Date</a>
+  <a href="?sort=priority" class="btn btn-secondary {% if sort_by == 'priority' %}active{% endif %}">Sort by Priority</a>
+</div>
+
+<form class="d-flex justify-content-end" role="search" method="GET">
+    <input class="form-control me-2" type="search" placeholder="Search Your Todos" aria-label="Search" name="todo_search" value="{{ request.GET.todo_search }}">
+    <input type="hidden" name="sort" value="{{ sort_by }}">
+    <button class="btn btn-outline-success" type="submit">Search</button>
 </form>
-    <div>
+
+<div>
     {% if todos %}
         {% for todo in todos %}
             <div class="card" style="width: 18rem;">
                 <div class="card-body">
-                    <h5 class="card-title">{{ todo.title }}</h5> 
+                    <h5 class="card-title">{{ todo.title }}</h5>
                     <h6 class="card-subtitle mb-2 text-body-secondary">{{todo.due_date}} - {{todo.priority}}</h6>
                     <p class="card-text">{{ todo.description }}</p>
-                    {% if todo.completed %} 
+                    {% if todo.completed %}
                         <span style="color: green;">Completed</span>
                     {% else %}
                         <span style="color: red;">Not Completed</span>
                     {% endif %}
-                </li>
+                </div>
             </div>
         {% endfor %}
     {% else %}
-        <li>No tasks</li>
+        <p>No tasks</p>
     {% endif %}
-    </div>
+</div>
+
 {% else %}
     <p>You need to be logged in to view your todo items.</p>
 {% endif %}
 
 <style>
-.btn{
+.btn {
   background-color: grey;
-  color:white;
+  color: white;
   border: none;
   border-radius: 7px;
 }
@@ -44,5 +51,3 @@
 <a href="{% url 'add_todo_item' %}" class="btn">Add To-Do Item</a>
 <a href="{% url 'delete_todo_item'%}" class="btn">Delete Item</a>
 {% endblock %}
-
-
