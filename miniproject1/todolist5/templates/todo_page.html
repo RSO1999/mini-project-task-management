@@ -13,36 +13,26 @@
 
   <ul>
     {% for todo in todos %}
+    
     <li>
       <!-- Strikethrough if complete == true-->
       <span style = "{% if todo.completed %}text-decoration: line-through;{% endif %}">
         {{ todo.title }}
       </span>
-      - Due: {{ todo.due_date }} --- Priority: {{ todo.get_priority_display }} - 
-      {% if todo.completed %}Completed{% else %}Not Completed{% endif %}
+      - Due: {{ todo.due_date }} | Priority: {{ todo.get_priority_display }} 
       <a href="{% url 'edit_todo' todo.id %}" class="btn btn-sm btn-link">Edit</a>
     </li>
     {% empty %}
     <li>No tasks.</li>
     {% endfor %}
   </ul>
+
+</style>
+<a href="{% url 'add_todo_item' %}" class="btn">Add To-Do Item</a>
+<a href="{% url 'delete_todo_item'%}" class="btn">Delete Item</a>
+<a href="{% url 'profile' %}">Go to Profile Page</a> 
+<a href="{% url 'home' %}">Go to Home Page</a> 
 {% endblock %}
-<h1>Todo Page</h1>
-<u1>
-  {% if todos %}
-      {% for todo in todos %}
-          <li>{{ todo.title }} - {{ todo.due_date }} - {{todo.priority}} - 
-              {% if todo.completed %} 
-                  <span style="color: green;">Completed</span>
-              {% else %}
-                  <span style="color: red;">Not Completed</span>
-              {% endif %}
-          </li>
-      {% endfor %}
-  {% else %}
-      <li>No tasks</li>
-  {% endif %}
-</u1>
 
 <style>
 .btn{
@@ -51,11 +41,7 @@
   border: none;
   border-radius: 7px;
 }
-</style>
-<a href="{% url 'add_todo_item' %}" class="btn">Add To-Do Item</a>
-<a href="{% url 'delete_todo_item'%}" class="btn">Delete Item</a>
-<a href="{% url 'profile' %}">Go to Profile Page</a> 
-<a href="{% url 'home' %}">Go to Home Page</a> 
+
 
 
 

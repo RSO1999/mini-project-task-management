@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect, HttpResponse
+from django.views import View
 from django.urls import reverse_lazy
 from django.views.generic.edit import UpdateView
 from django.db.models import Case, When, IntegerField
 from django.core.mail import send_mail
 from django.contrib.auth import login, authenticate
+from django.views.generic.edit import FormView
 from django.contrib import messages
 from .models import TodoItem
 from .forms import TodoItemForm, AccountRegistration, EditProfileForm, EditPasswordForm
@@ -164,10 +166,6 @@ def edit_password(request):
 
     todos = TodoItem.objects.all()
     return render(request, "home.html", {'todos': todos})
-
-def todo_page(request):
-    todos = TodoItem.objects.all()
-    return render(request, 'todo_page.html', {'todos':todos})
     
 class AddTodoItemView(FormView):
     template_name = 'add_todo_item.html'
@@ -194,25 +192,6 @@ class BulkDeleteTodoView(View):
             TodoItem.objects.filter(id__in=selected_items).delete()
 
         return redirect(self.success_url)
-        
-        return render(request, self.template_name, {'todo_ids': selected_items})
-'''  
-def register(request):
-    if request.method == "POST":
-        form = AccountRegistration(request.POST)
-        if form.is_valid():
-            email = form.cleaned_data.get('email')
-            form.save()
-            # send_mail(
-            #     'Welcome to the Group 5 Todo App',
-            #     'Thank you for registering with us!',
-            #     "{insert your email here}",
-            #     [email],
-            #     fail_silently=False,
-            # )
-            return redirect("/login/")
-    form = AccountRegistration()
-'''
 
 def profile(request):
     return render(request, "profile.html")
