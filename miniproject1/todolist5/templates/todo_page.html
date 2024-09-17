@@ -27,3 +27,35 @@
     {% endfor %}
   </ul>
 {% endblock %}
+<h1>Todo Page</h1>
+<u1>
+  {% if todos %}
+      {% for todo in todos %}
+          <li>{{ todo.title }} - {{ todo.due_date }} - {{todo.priority}} - 
+              {% if todo.completed %} 
+                  <span style="color: green;">Completed</span>
+              {% else %}
+                  <span style="color: red;">Not Completed</span>
+              {% endif %}
+          </li>
+      {% endfor %}
+  {% else %}
+      <li>No tasks</li>
+  {% endif %}
+</u1>
+
+<style>
+.btn{
+  background-color: grey;
+  color:white;
+  border: none;
+  border-radius: 7px;
+}
+</style>
+<a href="{% url 'add_todo_item' %}" class="btn">Add To-Do Item</a>
+<a href="{% url 'delete_todo_item'%}" class="btn">Delete Item</a>
+<a href="{% url 'profile' %}">Go to Profile Page</a> 
+<a href="{% url 'home' %}">Go to Home Page</a> 
+
+
+

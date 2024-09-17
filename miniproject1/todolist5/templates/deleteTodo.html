@@ -1,0 +1,35 @@
+<form method = "POST" id="deleteForm" action="{% url 'confirm_bulk_delete' %}">
+  {% csrf_token %}
+  <table>
+    <tr>
+      <th>Select</th>
+      <th>To-do Item</th>
+    </tr>
+    {% for item in todo_items %}
+    <tr>
+      <td><input type="checkbox" name="todo_ids" value="{{ item.id }}"></td>
+      <td>{{ item.title }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  <button type="submit" onclick="confirmDelete()">Delete Selected Items</button>
+</form>
+
+<a href="{% url 'todo_page' %}">Back to Todo Page</a>
+
+<script>
+  function confirmDelete() {
+        const checkedBoxes = document.querySelectorAll('input[name="todo_ids"]:checked');
+
+        if (checkedBoxes.length === 0) {
+            alert("No items selected.");
+            return;
+        }
+
+        const confirmDelete = confirm("Are you sure you want to delete the selected items?");
+
+        if (confirmDelete) {
+          document.getElementById('deleteForm').submit();
+      }
+    }
+</script>

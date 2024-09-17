@@ -1,13 +1,7 @@
-
-from django.db import models
-from django.contrib.auth.models import User
-import datetime
-from django.urls import reverse
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 import datetime
 from django.conf import settings
-
 
 class TodoUser(AbstractUser):
     email = models.EmailField(unique=True)
@@ -15,20 +9,17 @@ class TodoUser(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 
-
 class TodoItem(models.Model):
     LEVEL_CHOICES = [
         ('L', 'Low'),
         ('M', 'Medium'),
         ('H', 'High'),
     ]
-
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)  # FOREIGN KEY
-
-    title = models.CharField(max_length=50, null=False,
-                             blank=False, default="My Task")
-    description = models.TextField(max_length=500, null=True, blank=True)
+    
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,null=False)
+    
+    title = models.CharField(max_length=50, null=False, blank=False, default="My Task")
+    description = models.TextField(max_length=500, null=True, blank=True, default='')
     completed = models.BooleanField(default=False)
     due_date = models.DateField(default=datetime.date.today)
     priority = models.CharField(
@@ -38,4 +29,5 @@ class TodoItem(models.Model):
         return self.title
 
     class Meta:
-        ordering = ['due_date']
+        ordering=['due_date']
+
