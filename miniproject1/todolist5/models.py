@@ -22,11 +22,12 @@ class TodoItem(models.Model):
     description = models.TextField(max_length=500, null=True, blank=True, default='')
     completed = models.BooleanField(default=False)
     due_date = models.DateField(default=datetime.date.today)
-    priority = models.CharField(max_length=10, choices=LEVEL_CHOICES, default='M')
-    
+    priority = models.CharField(
+        max_length=10, choices=LEVEL_CHOICES, default='M')
+
     def __str__(self):
         return self.title
-    
+
     class Meta:
         ordering=['due_date']
 
