@@ -50,7 +50,9 @@ def todo_login(request):
     if request.method == "POST":
         email = request.POST.get("email")
         password = request.POST.get("password")
+        print(user)
         user = authenticate(request, email=email, password=password)
+        print(user)
         if user is not None:
             login(request, user)
             return redirect("profile")
@@ -78,11 +80,6 @@ def edit_password(request):
             messages.success(request, "Password updated successfully. Please log in again.")
             return redirect("login")
     return render(request, "edit_password.html", {"form": EditPasswordForm(user=request.user)})
-
-
-
-    todos = TodoItem.objects.all()
-    return render(request, "home.html", {'todos': todos})
 
 def todo_page(request):
     todos = TodoItem.objects.all()
@@ -115,23 +112,3 @@ class BulkDeleteTodoView(View):
         return redirect(self.success_url)
         
         return render(request, self.template_name, {'todo_ids': selected_items})
-'''  
-def register(request):
-    if request.method == "POST":
-        form = AccountRegistration(request.POST)
-        if form.is_valid():
-            email = form.cleaned_data.get('email')
-            form.save()
-            # send_mail(
-            #     'Welcome to the Group 5 Todo App',
-            #     'Thank you for registering with us!',
-            #     "{insert your email here}",
-            #     [email],
-            #     fail_silently=False,
-            # )
-            return redirect("/login/")
-    form = AccountRegistration()
-'''
-
-def profile(request):
-    return render(request, "profile.html")
