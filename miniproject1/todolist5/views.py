@@ -50,9 +50,7 @@ def todo_login(request):
     if request.method == "POST":
         email = request.POST.get("email")
         password = request.POST.get("password")
-        print(user)
         user = authenticate(request, email=email, password=password)
-        print(user)
         if user is not None:
             login(request, user)
             return redirect("profile")

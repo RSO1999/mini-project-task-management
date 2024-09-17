@@ -15,16 +15,9 @@
   {% endif %}
 </u1>
 
-<style>
-.btn{
-  background-color: grey;
-  color:white;
-  border: none;
-  border-radius: 7px;
-}
-</style>
-<a href="{% url 'add_todo_item' %}" class="btn">Add To-Do Item</a>
-<a href="{% url 'delete_todo_item'%}" class="btn">Delete Item</a>
+
+<a href="{% url 'add_todo_item' %}" >Add To-Do Item</a>
+<a href="{% url 'delete_todo_item'%}">Delete Item</a>
 <a href="{% url 'profile' %}">Go to Profile Page</a> 
 <a href="{% url 'home' %}">Go to Home Page</a> 
 

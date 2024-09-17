@@ -1,3 +1,25 @@
+<style>
+  button{
+    background-color: grey;
+    color: white;
+    font-weight: bold;
+    font-size: 15px;
+    border: none;
+    border-radius: 3px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 7px;
+    padding-right: 7px;
+    cursor: pointer;
+  }
+  th{
+    font-size: 30px;
+  }
+
+  a{
+    font-size: 16px;
+  }
+</style>
 <form method = "POST" id="deleteForm" action="{% url 'confirm_bulk_delete' %}">
   {% csrf_token %}
   <table>
@@ -19,6 +41,7 @@
 
 <script>
   function confirmDelete() {
+    event.preventDefault();
         const checkedBoxes = document.querySelectorAll('input[name="todo_ids"]:checked');
 
         if (checkedBoxes.length === 0) {
@@ -30,6 +53,9 @@
 
         if (confirmDelete) {
           document.getElementById('deleteForm').submit();
+        }else{
+          return false;
+          
+        }
       }
-    }
 </script>

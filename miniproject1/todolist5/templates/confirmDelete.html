@@ -1,9 +1,0 @@
-<h2>Are you sure you want to delete the items selected?</h2>
-<form method="POST">
-  {% csrf_token %}
-  {% for todo_id in todo_ids %}
-    <input type="hidden" name="todo_ids" value="{{ todo_id }}">
-  {% endfor %}
-  <button type="submit" name="confirm_delete">Yes</button>
-  <a href="{% url 'delete_todo_item' %}">No</a>
-</form>
