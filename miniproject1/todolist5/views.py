@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, HttpResponse
 from django.views import View
 from django.urls import reverse_lazy
 from django.views.generic.edit import UpdateView
+from django.db import models
 from django.db.models import Case, When, IntegerField
 from django.core.mail import send_mail
 from django.contrib.auth import login, authenticate
@@ -21,13 +22,23 @@ class TodoItemUpdateView(UpdateView):
 
 
 def todo_page(request):
+    # Filter todos based on the logged-in user
+    todos = TodoItem.objects.filter(user=request.user)
+    
+    # Retrieve search and sort parameters
+    search_query = request.GET.get("todo_search", "")
     sort_by = request.GET.get('sort', 'due_date')
+    
+    # Apply search filter
+    todos = todos.filter(
+        models.Q(title__icontains=search_query) | 
+        models.Q(description__icontains=search_query)
+    )
+    
+    # Apply sorting
     if sort_by == 'priority':
-        # Sort
-        todos = TodoItem.objects.all().order_by(
-
+        todos = todos.order_by(
             Case(
-
                 When(priority='H', then=1),
                 When(priority='M', then=2),
                 When(priority='L', then=3),
@@ -35,11 +46,15 @@ def todo_page(request):
             )
         )
     else:
-        # due date sorting
-
-        todos = TodoItem.objects.all().order_by('due_date')
-
-    return render(request, "todo_page.html", {'todos': todos, 'sort_by': sort_by})
+        todos = todos.order_by('due_date')
+    
+    # Pass the sorted and filtered todos to the template
+    context = {
+        'todos': todos,
+        'sort_by': sort_by,
+        'search_query': search_query
+    }
+    return render(request, "todo_page.html", context)
 
 
 def home(request):
@@ -136,7 +151,7 @@ def todo_login(request):
         user = authenticate(request, email=email, password=password)
         if user is not None:
             login(request, user)
-            return redirect("profile")
+            return redirect("todo_page")
         else:
             messages.error(request, "Invalid email or password.")
     return render(request, "login.html")
