@@ -161,11 +161,6 @@ def edit_password(request):
             messages.success(request, "Password updated successfully. Please log in again.")
             return redirect("login")
     return render(request, "edit_password.html", {"form": EditPasswordForm(user=request.user)})
-
-
-
-    todos = TodoItem.objects.all()
-    return render(request, "home.html", {'todos': todos})
     
 class AddTodoItemView(FormView):
     template_name = 'add_todo_item.html'
