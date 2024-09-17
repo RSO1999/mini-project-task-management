@@ -13,7 +13,6 @@ urlpatterns = [
     path("logout/", auth_views.LogoutView.as_view(next_page="login"), name="logout"),
     path('todo-page', views.todo_page, name='todo_page'),
     path("change-password/", views.edit_password, name="change_password"),
-    path("profile/", views.profile, name="profile"),
     path("edit-profile/", views.edit_profile, name="edit_profile"),
     path('add/', AddTodoItemView.as_view(), name='add_todo_item'),
     path('delete-items/', views.delete_todo_item, name='delete_todo_item'),

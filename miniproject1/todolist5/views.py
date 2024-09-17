@@ -53,7 +53,7 @@ def todo_login(request):
         user = authenticate(request, email=email, password=password)
         if user is not None:
             login(request, user)
-            return redirect("profile")
+            return redirect("todo_page")
         else:
             messages.error(request, "Invalid email or password.")
     return render(request, "login.html")
@@ -85,7 +85,14 @@ def edit_password(request):
     return render(request, "home.html", {'todos': todos})
 
 def todo_page(request):
-    todos = TodoItem.objects.all()
+    if request.method == "POST":
+        search_query = request.POST.get("todo_search")
+        todos = TodoItem.objects.filter(
+            models.Q(title__icontains=search_query) | models.Q(description__icontains=search_query),
+            user=request.user
+        )
+    else:
+        todos = TodoItem.objects.filter(user=request.user)
     return render(request, 'todo_page.html', {'todos':todos})
     
 class AddTodoItemView(FormView):
@@ -115,23 +122,6 @@ class BulkDeleteTodoView(View):
         return redirect(self.success_url)
         
         return render(request, self.template_name, {'todo_ids': selected_items})
-'''  
-def register(request):
-    if request.method == "POST":
-        form = AccountRegistration(request.POST)
-        if form.is_valid():
-            email = form.cleaned_data.get('email')
-            form.save()
-            # send_mail(
-            #     'Welcome to the Group 5 Todo App',
-            #     'Thank you for registering with us!',
-            #     "{insert your email here}",
-            #     [email],
-            #     fail_silently=False,
-            # )
-            return redirect("/login/")
-    form = AccountRegistration()
-'''
 
 def profile(request):
     return render(request, "profile.html")

@@ -1,19 +1,37 @@
+{% extends "base.html" %}
+{% block title %} Todo Page {% endblock %}
+{% block content %}
 <h1>Todo Page</h1>
-<u1>
-  {% if todos %}
-      {% for todo in todos %}
-          <li>{{ todo.title }} - {{ todo.due_date }} - {{todo.priority}} - 
-              {% if todo.completed %} 
-                  <span style="color: green;">Completed</span>
-              {% else %}
-                  <span style="color: red;">Not Completed</span>
-              {% endif %}
-          </li>
-      {% endfor %}
-  {% else %}
-      <li>No tasks</li>
-  {% endif %}
-</u1>
+{% if request.user.is_authenticated %}
+<form class="d-flex justify-content-end" role="search" method="POST"> {% csrf_token %}
+    <div class="">
+        <input class="form-control me-2" type="search" placeholder="Search Your Todos" aria-label="Search" name="todo_search">
+        <button class="btn btn-outline-success" type="submit">Search</button>
+    </div>
+</form>
+    <div>
+    {% if todos %}
+        {% for todo in todos %}
+            <div class="card" style="width: 18rem;">
+                <div class="card-body">
+                    <h5 class="card-title">{{ todo.title }}</h5> 
+                    <h6 class="card-subtitle mb-2 text-body-secondary">{{todo.due_date}} - {{todo.priority}}</h6>
+                    <p class="card-text">{{ todo.description }}</p>
+                    {% if todo.completed %} 
+                        <span style="color: green;">Completed</span>
+                    {% else %}
+                        <span style="color: red;">Not Completed</span>
+                    {% endif %}
+                </li>
+            </div>
+        {% endfor %}
+    {% else %}
+        <li>No tasks</li>
+    {% endif %}
+    </div>
+{% else %}
+    <p>You need to be logged in to view your todo items.</p>
+{% endif %}
 
 <style>
 .btn{
@@ -25,8 +43,6 @@
 </style>
 <a href="{% url 'add_todo_item' %}" class="btn">Add To-Do Item</a>
 <a href="{% url 'delete_todo_item'%}" class="btn">Delete Item</a>
-<a href="{% url 'profile' %}">Go to Profile Page</a> 
-<a href="{% url 'home' %}">Go to Home Page</a> 
-
+{% endblock %}
 
 
