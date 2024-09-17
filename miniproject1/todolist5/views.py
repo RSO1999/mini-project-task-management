@@ -107,7 +107,7 @@ def edit_profile(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Profile updated successfully.")
-            return redirect("profile")
+            return redirect("todo_page")
     return render(request, "edit_profile.html", {"form": EditProfileForm(instance=request.user)})
 
 
@@ -168,7 +168,7 @@ def edit_profile(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Profile updated successfully.")
-            return redirect("profile")
+            return redirect("todo_page")
     return render(request, "edit_profile.html", {"form": EditProfileForm(instance=request.user)})
 
 
