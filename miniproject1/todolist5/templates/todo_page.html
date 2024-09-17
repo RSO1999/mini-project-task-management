@@ -23,6 +23,8 @@
                     <h5 class="card-title">{{ todo.title }}</h5>
                     <h6 class="card-subtitle mb-2 text-body-secondary">{{todo.due_date}} - {{todo.priority}}</h6>
                     <p class="card-text">{{ todo.description }}</p>
+                    <a href="{% url 'edit_todo' todo.id %}">Edit</a>
+                    <!--added edit button-->
                     {% if todo.completed %}
                         <span style="color: green;">Completed</span>
                     {% else %}
