@@ -3,6 +3,20 @@
 {% block content %}
 <h1>Edit Profile</h1>
 {% if request.user.is_authenticated %}
+{% if messages %}
+    {% for message in messages %}
+      {% if message.tags == 'error'%}
+      <div class="alert alert-danger" role="alert">
+        {{ message }}
+      </div>
+      {% endif %}
+      {% if message.tags == 'success'%}
+      <div class="alert alert-success" role="alert">
+        {{ message }}
+      </div>
+      {% endif %}
+    {% endfor %}
+{% endif %}
 <form method="post" action="{% url 'edit_profile' %}">{% csrf_token %}
     <div class="mb-3">
     <label for="email" class="form-label">Change Email</label>
