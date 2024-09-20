@@ -11,15 +11,15 @@ from datetime import timedelta
 
 class TodoTeam(models.Model):
     name = models.CharField("My Group", max_length=50)
-    description = models.CharField("Enter a Description for your group!", max_length=255, blank=False)
-    users = models.ManyToManyField('TodoUser', related_name='teams', blank=True) #ManyToMany fields by default prevent dupes. Logic on frontend might still need to be made to support this. idk
+    description = models.CharField("Enter a Description for your team!", max_length=255, blank=False)
+    users = models.ManyToManyField('TodoUser', blank=True) #ManyToMany fields by default prevent dupes. Logic on frontend might still need to be made to support this. idk
 
     def __str__(self):
         return self.name
 
 class TodoUser(AbstractUser):
     email = models.EmailField(unique=True)
-    teams = models.ManyToManyField(TodoTeam, related_name="users", blank=True)
+    users = models.ManyToManyField(TodoTeam, blank=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
@@ -59,7 +59,7 @@ class TodoItem(models.Model):
         blank=False,
     )
     
-    assignee = models.ForeignKey('TodoUser', null=True, blank=True, on_delete=models.SET_NULL)  # ForeignKey to TodoUser
+    assignee = models.ForeignKey('TodoUser', null=True, blank=True, on_delete=models.SET_NULL, related_name='assigned_user')  # ForeignKey to TodoUser
     
     #Reminder Feature
     reminder_time_delta = models.DurationField(null=True, blank=True) #Time Delta before due date that you want to be reminded at. Will need to add validators once feature is developed.
