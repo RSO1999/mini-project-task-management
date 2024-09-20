@@ -2,14 +2,13 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from . import views
-from .views import AddTodoItemView, home, BulkDeleteTodoView
+from .views import AddTodoItemView
 
 
 # http://localhost:8000/
 urlpatterns = [
-    path("", views.home, name="home"),
+    path("", views.todo_login, name="login"),
     path("register/", views.register, name="register"),
-    path("login/", views.todo_login, name="login"),
     path("logout/", auth_views.LogoutView.as_view(next_page="login"), name="logout"),
     path('todo-page', views.todo_page, name='todo_page'),
     path("change-password/", views.edit_password, name="change_password"),

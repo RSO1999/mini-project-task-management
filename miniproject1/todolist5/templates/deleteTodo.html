@@ -20,6 +20,9 @@
     font-size: 16px;
   }
 </style>
+{% extends "base.html" %}
+{% block title %} Delete Todo Items {% endblock %}
+{%block content%}
 <form method = "POST" id="deleteForm" action="{% url 'confirm_bulk_delete' %}">
   {% csrf_token %}
   <table>
@@ -38,6 +41,7 @@
 </form>
 
 <a href="{% url 'todo_page' %}">Back to Todo Page</a>
+{% endblock %}
 
 <script>
   function confirmDelete() {
