@@ -1,33 +1,21 @@
+from .models import TodoUser, TodoItem
 from django import forms
 from .models import TodoItem
 from . import models
-from django.contrib.auth.forms import  UserCreationForm
-from django.contrib.auth.forms import  UserCreationForm, SetPasswordForm
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, SetPasswordForm
 from django import forms
 from .models import TodoUser
 
-#class AccountRegistration(UserCreationForm):
-    #email = forms.EmailField(label='Email')
-   #username = forms.CharField(label='Username')
-    #password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
-    #assword2 = forms.CharField(label='Confirm Password', widget=forms.PasswordInput) 
-   
-    #class Meta:
-        #model = models.User
-        #fields = ['email', 'username', 'password1', 'password2']
+# class AccountRegistration(UserCreationForm):
+# email = forms.EmailField(label='Email')
+# username = forms.CharField(label='Username')
+# password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
+# assword2 = forms.CharField(label='Confirm Password', widget=forms.PasswordInput)
 
-
-class TodoItemForm(forms.ModelForm):
-    class Meta:
-        model = TodoItem
-        fields = ['title', 'description','due_date', 'priority']
-        widgets = {
-            'due_date': forms.DateInput(attrs={'type': 'date'}),
-            'priority': forms.Select(choices=TodoItem.LEVEL_CHOICES),
-        }
-        
-
-
+# class Meta:
+# model = models.User
+# fields = ['email', 'username', 'password1', 'password2']
 
 
 class AccountRegistration(UserCreationForm):
@@ -42,7 +30,7 @@ class AccountRegistration(UserCreationForm):
             'placeholder': 'Username',
             'minlength': '5',
             'maxlength': '20',
-            })
+        })
         self.fields['email'].widget.attrs.update({
             'required': 'True',
             'name': 'email',
@@ -50,7 +38,7 @@ class AccountRegistration(UserCreationForm):
             'type': 'email',
             'class': 'form-control',
             'placeholder': 'name@example.com',
-            })
+        })
         self.fields['password1'].widget.attrs.update({
             'required': 'True',
             'name': 'password1',
@@ -59,7 +47,7 @@ class AccountRegistration(UserCreationForm):
             'class': 'form-control',
             'placeholder': 'Password',
             'minlength': '8',
-            })
+        })
         self.fields['password2'].widget.attrs.update({
             'required': 'True',
             'name': 'password2',
@@ -68,11 +56,12 @@ class AccountRegistration(UserCreationForm):
             'class': 'form-control',
             'placeholder': 'Confirm Password',
             'minlength': '8',
-            })
-   
+        })
+
     class Meta:
         model = TodoUser
         fields = ['email', 'username', 'password1', 'password2']
+
 
 class EditProfileForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -86,7 +75,7 @@ class EditProfileForm(forms.ModelForm):
             'placeholder': 'Username',
             'minlength': '5',
             'maxlength': '20',
-            })
+        })
         self.fields['email'].widget.attrs.update({
             'required': 'True',
             'name': 'email',
@@ -95,12 +84,14 @@ class EditProfileForm(forms.ModelForm):
             'class': 'form-control',
             'placeholder': ''
         })
+
     class Meta:
         model = TodoUser
         fields = ['username', 'email']
 
     username = forms.CharField(max_length=150, required=True)
     email = forms.EmailField(required=True)
+
 
 class EditPasswordForm(SetPasswordForm):
     def __init__(self, *args, **kwargs):
@@ -113,7 +104,7 @@ class EditPasswordForm(SetPasswordForm):
             'class': 'form-control',
             'placeholder': 'Password',
             'minlength': '8',
-            }),
+        }),
         self.fields['new_password2'].widget.attrs.update({
             'required': 'True',
             'name': 'password2',
@@ -122,20 +113,33 @@ class EditPasswordForm(SetPasswordForm):
             'class': 'form-control',
             'placeholder': 'Confirm Password',
             'minlength': '8',
-            })
-  
+        })
+
     class Meta:
         model = TodoUser
-        fields = ['new_password1', 'new_password2'] 
-from django.contrib.auth.forms import UserCreationForm, SetPasswordForm
-from django import forms
-from .models import TodoUser, TodoItem
+        fields = ['new_password1', 'new_password2']
 
 
 class TodoItemForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+
+        super(TodoItemForm, self).__init__(*args, **kwargs)
+
+        # adds calendar feature
+        self.fields['due_date'].widget = forms.DateInput(attrs={
+            'type': 'date',
+            'class': 'form-control',
+            'placeholder': 'Select Due Date'
+
+        })
+
     class Meta:
         model = TodoItem
-        fields = ['title', 'description', 'completed', 'due_date', 'priority']
+        fields = ['user', 'team', 'title', 'description', 'completed',
+                  'due_date', 'priority', 'category', 'assignee', 'reminder_time_delta']
+        widgets = {
+            'priority': forms.Select(choices=TodoItem.LEVEL_CHOICES),
+        }
 
 
 class AccountRegistration(UserCreationForm):

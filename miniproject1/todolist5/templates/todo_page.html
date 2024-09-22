@@ -1,21 +1,32 @@
 {% extends "base.html" %}
 {% block title %} Todo Page {% endblock %}
 {% block content %}
-<h1>Todo Page</h1>
+
+<h1>To-Do Page</h1>
 {% if request.user.is_authenticated %}
 
-<div class="btn-group mb-3">
-  <a href="?sort=due_date" class="btn btn-primary {% if sort_by == 'due_date' %}active{% endif %}">Sort by Due Date</a>
-  <a href="?sort=priority" class="btn btn-secondary {% if sort_by == 'priority' %}active{% endif %}">Sort by Priority</a>
-</div>
+  <div class="btn-group mb-3">
+    <a href="?sort=due_date" class="btn btn-primary {% if sort_by == 'due_date' %}active{% endif %}">Sort by Due Date</a>
+    <a href="?sort=priority" class="btn btn-secondary {% if sort_by == 'priority' %}active{% endif %}">Sort by Priority</a>
+  </div>
 
-<form class="d-flex justify-content-end" role="search" method="GET">
-    <input class="form-control me-2" type="search" placeholder="Search Your Todos" aria-label="Search" name="todo_search" value="{{ request.GET.todo_search }}">
-    <input type="hidden" name="sort" value="{{ sort_by }}">
-    <button class="btn btn-outline-success" type="submit">Search</button>
-</form>
+  <form class="d-flex justify-content-end" role="search" method="GET">
+      <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="todo_search" value="{{ request.GET.todo_search }}">
+      <input type="hidden" name="sort" value="{{ sort_by }}">
+      <button class="btn btn-outline-success" type="submit">Search</button>
+  </form>
+  <a href="{% url 'add_todo_item' %}" class="btn">+</a>
+  <a href="{% url 'delete_todo_item' %}" class="btn btn-danger">Delete Item</a>
 
-<div class="todo-grid">
+  <!-- Category dropdown button -->
+  <select class="btn">
+    <option>Category</option>
+  </select>
+
+  <!-- Show Archive button -->
+  <a href="#" class="btn">Show Archive</a>
+
+  <div class="todo-grid">
     {% if todos %}
         {% for todo in todos %}
             <div class="card sticky-note" style="background-color: {% cycle '#fdfd96' '#ffb6b9' '#d4f1f4' '#ffcc99' %};">
@@ -35,17 +46,14 @@
     {% else %}
         <p>No tasks</p>
     {% endif %}
-</div>
+  </div>
 
 {% else %}
     <p>You need to be logged in to view your todo items.</p>
 {% endif %}
 
-<a href="{% url 'add_todo_item' %}" class="btn">Add To-Do Item</a>
-<a href="{% url 'delete_todo_item' %}" class="btn">Delete Item</a>
-
 <style>
-  /* grid */
+  /* Grid layout */
   .todo-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -53,7 +61,7 @@
     padding: 20px;
   }
 
-  /* sticky note */
+  /* Sticky note */
   .sticky-note {
     padding: 15px;
     border-radius: 10px;
@@ -67,12 +75,17 @@
     transform: translateY(-5px);
   }
 
-  /* button styling */
+  /* Button styling */
   .btn {
     background-color: grey;
     color: white;
     border: none;
     border-radius: 7px;
   }
+
+  body {
+    overflow-x: hidden;
+  }
 </style>
 {% endblock %}
+
