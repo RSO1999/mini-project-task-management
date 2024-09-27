@@ -42,7 +42,7 @@ class TodoItem(models.Model):
     title = models.CharField(max_length=50, null=True, blank=True, default="My Task")
     description = models.TextField(max_length=500, null=True, blank=True, default='')
     #MOVED COMPLETED
-    due_date = models.DateField(default=datetime.date.today)
+    due_date = models.DateTimeField(default=datetime.datetime.now)
     priority = models.CharField(max_length=10, choices=LEVEL_CHOICES, default='M')
     
     #=============
@@ -62,7 +62,7 @@ class TodoItem(models.Model):
     assignee = models.ForeignKey('TodoUser', null=True, blank=True, on_delete=models.SET_NULL, related_name='assigned_user')  # ForeignKey to TodoUser
     
     #Reminder Feature
-    reminder_time_delta = models.DurationField(null=True, blank=True) #Time Delta before due date that you want to be reminded at. Will need to add validators once feature is developed.
+    reminder_date = models.DateTimeField(default=datetime.datetime.now) #Time To be reminded at
     
     #Timer Feature
     total_duration = models.DurationField(default=timedelta(0), null=False, blank=False)  # Track total time across stops/starts
@@ -118,6 +118,14 @@ class TodoItem(models.Model):
             raise ValidationError("A TodoItem can belong to either a user or a team, but not both.")
         if not self.user and not self.team:
             raise ValidationError("A TodoItem must belong to either a user or a team.")
+        
+        
+        
+        if self.reminder_date < timezone.now():
+            raise ValidationError("Reminder time cannot be in the past.")
+    
+        if  self.reminder_date > self.due_date:
+            raise ValidationError("Reminder time cannot be after the due date.")
     
     def __str__(self):
         return self.title
