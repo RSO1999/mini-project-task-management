@@ -9,7 +9,7 @@ sleep 5
 
 #APPLY MIGRATIONS
 echo "applying schema migrations"
-docker-compose run django python manage.py migrate
+
 
 #START DJANGO APP
 echo "starting django app"
