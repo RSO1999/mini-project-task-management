@@ -136,7 +136,7 @@ class TodoItemForm(forms.ModelForm):
         self.fields['reminder_date'].widget = forms.DateTimeInput(format=('%Y-%m-%dT%H:%M'), attrs={
             'type': 'datetime-local',
             'class': 'form-control',
-            'placeholder': 'Select Due Date',
+            'placeholder': 'Select Reminder Date'
         })
 
     class Meta:
