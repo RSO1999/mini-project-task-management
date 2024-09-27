@@ -124,19 +124,25 @@ class TodoItemForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
 
         super(TodoItemForm, self).__init__(*args, **kwargs)
+        
 
         # adds calendar feature
-        self.fields['due_date'].widget = forms.DateInput(attrs={
-            'type': 'date',
+        self.fields['due_date'].widget = forms.DateTimeInput(format=('%Y-%m-%dT%H:%M'), attrs={
+            'type': 'datetime-local',
             'class': 'form-control',
             'placeholder': 'Select Due Date'
-
+        })
+        
+        self.fields['reminder_date'].widget = forms.DateTimeInput(format=('%Y-%m-%dT%H:%M'), attrs={
+            'type': 'datetime-local',
+            'class': 'form-control',
+            'placeholder': 'Select Due Date',
         })
 
     class Meta:
         model = TodoItem
         fields = ['user', 'team', 'title', 'description', 'completed',
-                  'due_date', 'priority', 'category', 'assignee', 'reminder_time_delta']
+                  'due_date', 'priority', 'category', 'assignee', 'reminder_date']
         widgets = {
             'priority': forms.Select(choices=TodoItem.LEVEL_CHOICES),
         }
