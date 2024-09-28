@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+{% if request.user.is_authenticated %}
+    {% if messages %}
+        {% for message in messages %}
+        {% if message.tags == 'success'%}
+        <div class="alert alert-success" role="alert">
+            {{ message }}
+        </div>
+        {% endif %}
+        {% endfor %}
+    {% endif %}
+<div>
+    <h1>{{team.name}} To-Do Page</h1>
+    <p>{{team.description}}</p>
+</div>
+
+<div>
+    <h2>Team Members</h2>
+    <ul>
+    {% for user in team.users.all %}
+        <li>{{user.username}}</li>
+    {% endfor %}
+    </ul>
+</div>
+{% endif %}
+{% endblock %}
+

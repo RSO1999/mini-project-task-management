@@ -11,6 +11,8 @@ urlpatterns = [
     path("register/", views.register, name="register"),
     path("logout/", auth_views.LogoutView.as_view(next_page="login"), name="logout"),
     path('todo-page', views.todo_page, name='todo_page'),
+    path("create-team/", views.create_team, name="create_team"),
+    path("team/<int:pk>/", views.team_page, name="team_todo_page"),
     path("change-password/", views.edit_password, name="change_password"),
     path("edit-profile/", views.edit_profile, name="edit_profile"),
     path('add/', AddTodoItemView.as_view(), name='add_todo_item'),

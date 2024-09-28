@@ -5,6 +5,9 @@
 <h1>To-Do Page</h1>
 {% if request.user.is_authenticated %}
 
+<div>
+  <a class="btn btn-primary" href="{% url 'create_team' %}">Create a Team</a>
+</div>
   <div class="btn-group mb-3">
     <a href="?sort=due_date" class="btn btn-primary {% if sort_by == 'due_date' %}active{% endif %}">Sort by Due Date</a>
     <a href="?sort=priority" class="btn btn-secondary {% if sort_by == 'priority' %}active{% endif %}">Sort by Priority</a>
