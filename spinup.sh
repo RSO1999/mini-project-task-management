@@ -13,7 +13,7 @@ echo "applying schema migrations"
 
 #START DJANGO APP
 echo "starting django app"
-docker-compose up django -d --remove-orphans
+docker-compose up django --build -d --remove-orphans
 
 #DISPLAY CONTAINERS
 echo "CONTAINER STATUSES"

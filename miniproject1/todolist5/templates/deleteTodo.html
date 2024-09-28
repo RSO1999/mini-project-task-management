@@ -23,7 +23,7 @@
 {% extends "base.html" %}
 {% block title %} Delete Todo Items {% endblock %}
 {%block content%}
-<form method = "POST" id="deleteForm" action="{% url 'confirm_bulk_delete' %}">
+<form method = "POST" id="deleteForm" action="{% url 'confirm_personal_bulk_delete' user_id=request.user.id %}">
   {% csrf_token %}
   <table>
     <tr>
@@ -40,7 +40,7 @@
   <button type="submit" onclick="confirmDelete()">Delete Selected Items</button>
 </form>
 
-<a href="{% url 'todo_page' %}">Back to Todo Page</a>
+<a href="{% url 'personal_todo_page' user_id=user.id %}">Back to Todo Page</a>
 {% endblock %}
 
 <script>

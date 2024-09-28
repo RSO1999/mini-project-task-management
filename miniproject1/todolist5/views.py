@@ -1,6 +1,6 @@
-from django.shortcuts import render, redirect, HttpResponse
+from django.shortcuts import get_object_or_404, render, redirect, HttpResponse
 from django.views import View
-from django.urls import reverse_lazy, reverse
+from django.urls import reverse
 from django.views.generic.edit import UpdateView
 from django.db import models
 from django.db.models import Case, When, IntegerField
@@ -9,31 +9,24 @@ from django.contrib.auth import login, authenticate
 from django.views.generic.edit import FormView
 from django.contrib import messages
 from .models import TodoItem, TodoUser, TodoTeam
-from .forms import TodoItemForm, AccountRegistration, EditProfileForm, EditPasswordForm, TodoTeamForm, EditTodoTeamForm
+from .forms import EditTodoTeamForm, TodoItemForm, AccountRegistration, EditProfileForm, EditPasswordForm, TodoTeamForm
 
-class TodoItemUpdateView(UpdateView):
-    model = TodoItem
-    form_class = TodoItemForm
-    # this is needed in order to see the Edit Page
-    template_name = 'edit_todo.html'
-    # Redirects back to the home page after edit
-    success_url = reverse_lazy('todo_page')
+#-----------------
+#PERSONAL TODOLIST
+#-----------------
 
-def todo_page(request):
-    # Filter todos based on the logged-in user
-    todos = TodoItem.objects.filter(user=request.user)
-
-    # Retrieve search and sort parameters
+def personal_todo_page(request, user_id):
+    todos = TodoItem.objects.filter(user_id=user_id)
+    
     search_query = request.GET.get("todo_search", "")
+    
     sort_by = request.GET.get('sort', 'due_date')
-
-    # Apply search filter
+    
     todos = todos.filter(
         models.Q(title__icontains=search_query) |
         models.Q(description__icontains=search_query)
     )
-
-    # Apply sorting
+    
     if sort_by == 'priority':
         todos = todos.order_by(
             Case(
@@ -45,14 +38,113 @@ def todo_page(request):
         )
     else:
         todos = todos.order_by('due_date')
-
-    # Pass the sorted and filtered todos to the template
     context = {
+        'user_id': user_id,
         'todos': todos,
         'sort_by': sort_by,
         'search_query': search_query
     }
     return render(request, "todo_page.html", context)
+
+def add_personal_todo_item(request, user_id):
+    if request.method == 'POST':
+        form = TodoItemForm(request.POST)
+        if form.is_valid():
+            todo_item = form.save(commit=False)
+            todo_item.user = request.user 
+            todo_item.save()
+            messages.success(request, "To-do item added successfully!")
+            return redirect(reverse('personal_todo_page', kwargs={'user_id': request.user.id}))
+    else:
+        form = TodoItemForm() 
+
+    return render(request, 'add_todo_item.html', {'form': form, 'user_id': user_id})
+
+def edit_personal_todo_item(request, user_id, todo_id):
+    todo_item = get_object_or_404(TodoItem, id=todo_id, user=request.user)  # Fetch the todo item
+
+    if request.method == 'POST':
+        form = TodoItemForm(request.POST, instance=todo_item)  # Bind the form to the existing instance
+        if form.is_valid():
+            form.save()  # Save the updated todo item
+            messages.success(request, "To-do item updated successfully!")
+            return redirect(reverse('personal_todo_page', kwargs={'user_id': user_id}))  # Redirect to the todo page
+    else:
+        form = TodoItemForm(instance=todo_item)  # Create a form instance for GET requests
+
+    return render(request, 'edit_todo.html', {'form': form, 'user_id': user_id, 'todo_item': todo_item})
+
+def delete_personal_todo_item(request, user_id):
+    todo_items = TodoItem.objects.filter(user_id=user_id)
+    return render(request, 'deleteTodo.html', {'user_id': user_id, 'todo_items': todo_items})
+
+def confirm_personal_bulk_delete(request, user_id):
+    if request.method == 'POST':
+        selected_items = request.POST.getlist('todo_ids')
+        if selected_items:
+            TodoItem.objects.filter(id__in=selected_items).delete()
+
+        return redirect(reverse('personal_todo_page', kwargs={'user_id': request.user.id}))  # Redirect to the todo page
+
+    # If not a POST request, you might want to handle it accordingly (e.g., show an error or redirect)
+    return redirect(reverse('personal_todo_page', kwargs={'user_id': request.user.id}))  # Redirect for non-POST requests
+    
+    
+    
+#-----------------
+#TEAM TODOLIST
+#-----------------
+
+def team_todo_page(request, team_id):
+    team = TodoTeam.objects.get(id=team_id)
+    print(f"Users in team: {team.users.all()}")
+    return render(request, "team_todo_page.html", {"team_id":team_id, "team": team})
+    
+    
+#-----------------
+#TEAM LOGIC
+#-----------------
+    
+def create_team(request):
+    if request.method == "POST":
+        form = TodoTeamForm(request.POST, current_user=request.user)
+        if form.is_valid():
+            team = form.save() 
+            messages.success(request, "Team created successfully.")
+            return redirect(reverse('team_todo_page', kwargs={'team_id': team.id})) 
+        else:
+            messages.error(request, "There was an error creating the team. Please check the form.")
+    else:
+        form = TodoTeamForm(current_user=request.user)
+
+    return render(request, "create_team.html", {"form": form})
+
+def edit_team(request, team_id):
+    team = TodoTeam.objects.get(id=team_id)
+    if request.method == "POST":
+        form = EditTodoTeamForm(request.POST, instance=team)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Team updated successfully.")
+            return redirect(reverse('team_todo_page', kwargs={'team_id': team.id}))
+    else:
+        form = EditTodoTeamForm(instance=team)
+    return render(request, "edit_team.html", {"form": form, "team": team})
+
+
+#AUTH
+
+def todo_login(request):
+    if request.method == "POST":
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+        user = authenticate(request, email=email, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect("personal_todo_page", user_id= user.id)
+        else:
+            messages.error(request, "Invalid email or password.")
+    return render(request, "login.html")
 
 def register(request):
     if request.method == "POST":
@@ -76,18 +168,6 @@ def register(request):
     form = AccountRegistration()
     return render(request, "register.html", {"form": form})
 
-def todo_login(request):
-    if request.method == "POST":
-        email = request.POST.get("email")
-        password = request.POST.get("password")
-        user = authenticate(request, email=email, password=password)
-        if user is not None:
-            login(request, user)
-            return redirect("todo_page")
-        else:
-            messages.error(request, "Invalid email or password.")
-    return render(request, "login.html")
-
 def edit_profile(request):
     if request.method == "POST":
         form = EditProfileForm(request.POST, instance=request.user)
@@ -106,63 +186,3 @@ def edit_password(request):
                 request, "Password updated successfully. Please log in again.")
             return redirect("login")
     return render(request, "edit_password.html", {"form": EditPasswordForm(user=request.user)})
-
-class AddTodoItemView(FormView):
-    template_name = 'add_todo_item.html'
-    form_class = TodoItemForm
-    success_url = reverse_lazy('todo_page')
-
-    def form_valid(self, form):
-        todo_item = form.save(commit=False)
-        if self.request.user.is_authenticated:
-            todo_item.user = self.request.user
-        todo_item.save()
-        return super().form_valid(form)
-
-
-def delete_todo_item(request):
-    todo_items = TodoItem.objects.all()
-    return render(request, 'deleteTodo.html', {'todo_items': todo_items})
-
-
-class BulkDeleteTodoView(View):
-    success_url = reverse_lazy('delete_todo_item')
-
-    def post(self, request, *args, **kwargs):
-        selected_items = request.POST.getlist('todo_ids')
-        if selected_items:
-            TodoItem.objects.filter(id__in=selected_items).delete()
-
-        return redirect(self.success_url)
-    
-def create_team(request):
-    if request.method == "POST":
-        form = TodoTeamForm(request.POST, current_user=request.user)
-        if form.is_valid():
-            team = form.save() 
-            messages.success(request, "Team created successfully.")
-            return redirect(reverse('team_todo_page', args=[team.pk])) 
-        else:
-            messages.error(request, "There was an error creating the team. Please check the form.")
-    else:
-        form = TodoTeamForm(current_user=request.user)
-
-    return render(request, "create_team.html", {"form": form})
-
-
-def team_page(request, pk):
-    team = TodoTeam.objects.get(pk=pk)
-    print(f"Users in team: {team.users.all()}")
-    return render(request, "team_todo_page.html", {"team": team})
-
-def edit_team(request, pk):
-    team = TodoTeam.objects.get(pk=pk)
-    if request.method == "POST":
-        form = EditTodoTeamForm(request.POST, instance=team)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Team updated successfully.")
-            return redirect(reverse('team_todo_page', args=[team.pk]))
-    else:
-        form = EditTodoTeamForm(instance=team)
-    return render(request, "edit_team.html", {"form": form, "team": team})
