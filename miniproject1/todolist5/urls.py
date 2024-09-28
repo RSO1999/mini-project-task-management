@@ -13,6 +13,7 @@ urlpatterns = [
     path('todo-page', views.todo_page, name='todo_page'),
     path("create-team/", views.create_team, name="create_team"),
     path("team/<int:pk>/", views.team_page, name="team_todo_page"),
+    path("team/<int:pk>/edit/", views.edit_team, name="edit_team"),
     path("change-password/", views.edit_password, name="change_password"),
     path("edit-profile/", views.edit_profile, name="edit_profile"),
     path('add/', AddTodoItemView.as_view(), name='add_todo_item'),

@@ -187,5 +187,15 @@ class TodoTeamForm(forms.ModelForm):
                     [user.email],
                 )
         return team
+    
+class EditTodoTeamForm(forms.ModelForm):
+    class Meta:
+        model = TodoTeam
+        fields = ['name', 'description']
+        widgets = {
+            'name': forms.TextInput(attrs={'placeholder': 'Enter updated team name', 'class': 'form-control', 'default': {TodoTeam.name}}),
+            'description': forms.Textarea(attrs={'placeholder': 'Enter updated team description', 'class': 'form-control', 'rows': 3, 'default': {TodoTeam.description}}),
+        }
+
 
 

@@ -9,7 +9,7 @@ from django.contrib.auth import login, authenticate
 from django.views.generic.edit import FormView
 from django.contrib import messages
 from .models import TodoItem, TodoUser, TodoTeam
-from .forms import TodoItemForm, AccountRegistration, EditProfileForm, EditPasswordForm, TodoTeamForm
+from .forms import TodoItemForm, AccountRegistration, EditProfileForm, EditPasswordForm, TodoTeamForm, EditTodoTeamForm
 
 class TodoItemUpdateView(UpdateView):
     model = TodoItem
@@ -154,3 +154,15 @@ def team_page(request, pk):
     team = TodoTeam.objects.get(pk=pk)
     print(f"Users in team: {team.users.all()}")
     return render(request, "team_todo_page.html", {"team": team})
+
+def edit_team(request, pk):
+    team = TodoTeam.objects.get(pk=pk)
+    if request.method == "POST":
+        form = EditTodoTeamForm(request.POST, instance=team)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Team updated successfully.")
+            return redirect(reverse('team_todo_page', args=[team.pk]))
+    else:
+        form = EditTodoTeamForm(instance=team)
+    return render(request, "edit_team.html", {"form": form, "team": team})
