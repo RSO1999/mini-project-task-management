@@ -17,6 +17,12 @@ from django.contrib.auth.decorators import login_required
 #-----------------
 
 def personal_todo_page(request, user_id):
+
+    # If the user selects team from the dropdown, redirect to the team's todo page
+    team_id = request.GET.get('team_id', None)
+    if team_id:
+        return redirect("team_todo_page", team_id=team_id)
+    
     todos = TodoItem.objects.filter(user_id=user_id)
     
     search_query = request.GET.get("todo_search", "")
@@ -56,6 +62,9 @@ def personal_todo_page(request, user_id):
     # Filters by category
     categories = TodoItem.objects.filter(
         user=request.user).values_list('category', flat=True).distinct()
+    
+    # get the team(s) the user is in
+    user_teams = TodoTeam.objects.filter(users = request.user)
 
     # Pass the sorted or filtered list of todoItems to the template
     context = {
@@ -66,6 +75,7 @@ def personal_todo_page(request, user_id):
         'categories': categories,
         'selected_category': selected_category,
         'show_archive': show_archive,
+        'teams': user_teams,
     }
     return render(request, "personal/todo_page.html", context)
 
