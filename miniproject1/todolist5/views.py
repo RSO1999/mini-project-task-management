@@ -131,6 +131,14 @@ def edit_team(request, team_id):
         form = EditTodoTeamForm(instance=team)
     return render(request, "edit_team.html", {"form": form, "team": team})
 
+def delete_team(request, team_id):
+    team = TodoTeam.objects.get(id=team_id)
+    if request.method == "POST":
+        team = get_object_or_404(TodoTeam, id=team_id)
+        team.delete()
+        messages.success(request, f"Team {team.name} deleted successfully.")
+        return redirect("personal_todo_page", user_id=request.user.id)
+    return render(request, "delete_team.html", {"team": team})
 
 #AUTH
 

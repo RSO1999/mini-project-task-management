@@ -5,6 +5,15 @@
 <h1>To-Do Page</h1>
 {% if request.user.is_authenticated and request.user.id == user_id %}
 
+{% if messages %}
+    {% for message in messages %}
+    {% if message.tags == 'success'%}
+    <div class="alert alert-success" role="alert">
+        {{ message }}
+    </div>
+    {% endif %}
+    {% endfor %}
+{% endif %}
 <div>
   <a class="btn btn-primary" href="{% url 'create_team' %}">Create a Team</a>
 </div>

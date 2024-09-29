@@ -24,6 +24,7 @@ urlpatterns = [
      #TEAMS
      path('team/create_team/', views.create_team, name='create_team'),
      path('team/<int:team_id>/edit_team/', views.edit_team, name='edit_team'),
+     path("team/<int:team_id>/delete_team/", views.delete_team, name="delete_team"),
      
      #TEAM TODOLIST
      path('team/<int:team_id>/todolist/', views.team_todo_page, name='team_todo_page'),

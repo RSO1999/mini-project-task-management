@@ -10,6 +10,7 @@
         {% endif %}
         {% endfor %}
     {% endif %}
+<button type="button" class="btn btn-warning" onclick=window.location.href="{% url 'edit_team' team_id=team.id %}">Edit Team</button>
 <div>
     <h1>{{team.name}} To-Do Page</h1>
     <p>{{team.description}}</p>

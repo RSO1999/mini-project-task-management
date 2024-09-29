@@ -5,6 +5,8 @@
 <form method="post" action="{% url 'edit_team' team.id %}">{% csrf_token %}
     {{ form.as_p }}
     <button type="submit" class="btn btn-primary mb-3">Save</button>
-    <button type="button" class="btn btn-secondary" onclick=window.location.href="{% url 'team_todo_page' team_id=team.id %}">Cancel</button>
+    <button type="button" class="btn btn-secondary mb-3" onclick=window.location.href="{% url 'team_todo_page' team_id=team.id %}">Cancel</button>
 </form>
+
+<button type="button" class="btn btn-danger" onclick=window.location.href="{% url 'delete_team' team_id=team.id %}">Delete Team</button>
 {% endblock %}
