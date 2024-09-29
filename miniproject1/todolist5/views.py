@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.shortcuts import render, redirect, HttpResponse
 from django.views import View
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views.generic.edit import UpdateView
 from django.db import models
 from django.db.models import Case, When, IntegerField
@@ -9,8 +9,8 @@ from django.core.mail import send_mail
 from django.contrib.auth import login, authenticate
 from django.views.generic.edit import FormView
 from django.contrib import messages
-from .models import TodoItem
-from .forms import TodoItemForm, AccountRegistration, EditProfileForm, EditPasswordForm
+from .models import TodoItem, TodoUser, TodoTeam
+from .forms import TodoItemForm, AccountRegistration, EditProfileForm, EditPasswordForm, TodoTeamForm
 
 
 class TodoItemUpdateView(UpdateView):
@@ -158,3 +158,25 @@ class BulkDeleteTodoView(View):
             TodoItem.objects.filter(id__in=selected_items).delete()
 
         return redirect(self.success_url)
+
+
+def create_team(request):
+    if request.method == "POST":
+        form = TodoTeamForm(request.POST, current_user=request.user)
+        if form.is_valid():
+            team = form.save()
+            messages.success(request, "Team created successfully.")
+            return redirect(reverse('team_todo_page', args=[team.pk]))
+        else:
+            messages.error(
+                request, "There was an error creating the team. Please check the form.")
+    else:
+        form = TodoTeamForm(current_user=request.user)
+
+    return render(request, "create_team.html", {"form": form})
+
+
+def team_page(request, pk):
+    team = TodoTeam.objects.get(pk=pk)
+    print(f"Users in team: {team.users.all()}")
+    return render(request, "team_todo_page.html", {"team": team})
