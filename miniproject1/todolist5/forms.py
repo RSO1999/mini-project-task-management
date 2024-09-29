@@ -1,3 +1,4 @@
+from django.http import Http400
 from .models import TodoUser, TodoItem
 from django import forms
 from .models import TodoItem
@@ -115,10 +116,38 @@ class EditPasswordForm(SetPasswordForm):
 
 class TodoItemForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
-
+        
+        team = kwargs.pop('team', None)
+        user = kwargs.pop('user', None)
+        
         super(TodoItemForm, self).__init__(*args, **kwargs)
         
-
+        
+        #FORMS require either a user or team to be passed in, based on what is sent, it will automatically set the appropriate values...
+        if team: 
+            self.fields.pop('user')  
+            
+            self.initial['team'] = team
+            
+            self.fields['team'].widget = forms.HiddenInput()
+            self.fields['team'].widget.attrs['readonly'] = True
+            
+            self.fields['assignee'].queryset = team.users.all()
+        elif user:
+            self.fields.pop('team')
+            
+            self.initial['user'] = user
+            self.initial['assignee'] = user
+            
+            self.fields['user'].widget = forms.HiddenInput()
+            self.fields['user'].widget.attrs['readonly'] = True
+            
+            self.fields['assignee'].widget = forms.HiddenInput()
+            self.fields['assignee'].widget.attrs['readonly'] = True
+            
+        else:
+            raise Http400("Neither team nor user provided")
+            
         # adds calendar feature
         self.fields['due_date'].widget = forms.DateTimeInput(format=('%Y-%m-%dT%H:%M'), attrs={
             'type': 'datetime-local',

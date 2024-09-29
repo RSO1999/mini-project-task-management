@@ -63,10 +63,10 @@ def personal_todo_page(request, user_id):
     categories = TodoItem.objects.filter(
         user=request.user).values_list('category', flat=True).distinct()
     
-    # get the team(s) the user is in
+   
     user_teams = TodoTeam.objects.filter(users = request.user)
 
-    # Pass the sorted or filtered list of todoItems to the template
+    
     context = {
         'user_id': user_id,
         'todos': todos,
@@ -81,7 +81,7 @@ def personal_todo_page(request, user_id):
 
 def add_personal_todo_item(request, user_id):
     if request.method == 'POST':
-        form = TodoItemForm(request.POST)
+        form = TodoItemForm(request.POST, user=request.user)
         if form.is_valid():
             todo_item = form.save(commit=False)
             todo_item.user = request.user 
@@ -89,21 +89,21 @@ def add_personal_todo_item(request, user_id):
             messages.success(request, "To-do item added successfully!")
             return redirect(reverse('personal_todo_page', kwargs={'user_id': request.user.id}))
     else:
-        form = TodoItemForm() 
+        form = TodoItemForm(user=request.user) 
 
     return render(request, 'personal/add_todo.html', {'form': form, 'user_id': user_id})
 
 def edit_personal_todo_item(request, user_id, todo_id):
-    todo_item = get_object_or_404(TodoItem, id=todo_id, user=request.user)  # Fetch the todo item
+    todo_item = get_object_or_404(TodoItem, id=todo_id, user=request.user)
 
     if request.method == 'POST':
-        form = TodoItemForm(request.POST, instance=todo_item)  # Bind the form to the existing instance
+        form = TodoItemForm(request.POST, instance=todo_item, user=request.user)  
         if form.is_valid():
-            form.save()  # Save the updated todo item
+            form.save()  
             messages.success(request, "To-do item updated successfully!")
-            return redirect(reverse('personal_todo_page', kwargs={'user_id': user_id}))  # Redirect to the todo page
+            return redirect(reverse('personal_todo_page', kwargs={'user_id': user_id}))
     else:
-        form = TodoItemForm(instance=todo_item)  # Create a form instance for GET requests
+        form = TodoItemForm(instance=todo_item, user=request.user)
 
     return render(request, 'personal/edit_todo.html', {'form': form, 'user_id': user_id, 'todo_item': todo_item})
 
@@ -117,10 +117,9 @@ def confirm_personal_bulk_delete(request, user_id):
         if selected_items:
             TodoItem.objects.filter(id__in=selected_items).delete()
 
-        return redirect(reverse('personal_todo_page', kwargs={'user_id': request.user.id}))  # Redirect to the todo page
+        return redirect(reverse('personal_todo_page', kwargs={'user_id': request.user.id})) 
 
-    # If not a POST request, you might want to handle it accordingly (e.g., show an error or redirect)
-    return redirect(reverse('personal_todo_page', kwargs={'user_id': request.user.id}))  # Redirect for non-POST requests
+    return redirect(reverse('personal_todo_page', kwargs={'user_id': request.user.id}))
     
     
     
@@ -172,7 +171,6 @@ def team_todo_page(request, team_id):
     categories = TodoItem.objects.filter(
         team_id=team_id).values_list('category', flat=True).distinct()
 
-    # Pass the sorted or filtered list of todoItems to the template
     context = {
         'team': team,
         'team_id': team_id,
@@ -188,7 +186,7 @@ def team_todo_page(request, team_id):
 def add_team_todo_item(request, team_id):
     team = TodoTeam.objects.get(id=team_id)
     if request.method == 'POST':
-        form = TodoItemForm(request.POST)
+        form = TodoItemForm(request.POST, team=team)
         if form.is_valid():
             todo_item = form.save(commit=False)
             todo_item.team = team
@@ -196,7 +194,7 @@ def add_team_todo_item(request, team_id):
             messages.success(request, "To-do item added successfully!")
             return redirect(reverse('team_todo_page', kwargs={'team_id': team.id}))
     else:
-        form = TodoItemForm() 
+        form = TodoItemForm(team=team) 
 
     return render(request, 'teams/team_add_todo.html', {'form': form, 'team_id': team_id, 'team': team})
 
@@ -205,13 +203,13 @@ def edit_team_todo_item(request, team_id, todo_id):
     todo_item = get_object_or_404(TodoItem, id=todo_id, team=team)
 
     if request.method == 'POST':
-        form = TodoItemForm(request.POST, instance=todo_item)
+        form = TodoItemForm(request.POST, instance=todo_item, team=team)
         if form.is_valid():
             form.save()
             messages.success(request, "To-do item updated successfully!")
             return redirect(reverse('team_todo_page', kwargs={'team_id': team_id}))
     else:
-        form = TodoItemForm(instance=todo_item) 
+        form = TodoItemForm(instance=todo_item, team=team) 
     return render(request, 'teams/team_edit_todo.html', {'form': form, 'team_id': team_id, 'team': team, 'todo_item': todo_item})
 
 def delete_team_todo_item(request, team_id):
