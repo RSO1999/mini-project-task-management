@@ -44,7 +44,7 @@ def personal_todo_page(request, user_id):
         'sort_by': sort_by,
         'search_query': search_query
     }
-    return render(request, "todo_page.html", context)
+    return render(request, "personal/todo_page.html", context)
 
 def add_personal_todo_item(request, user_id):
     if request.method == 'POST':
@@ -58,7 +58,7 @@ def add_personal_todo_item(request, user_id):
     else:
         form = TodoItemForm() 
 
-    return render(request, 'add_todo_item.html', {'form': form, 'user_id': user_id})
+    return render(request, 'personal/add_todo.html', {'form': form, 'user_id': user_id})
 
 def edit_personal_todo_item(request, user_id, todo_id):
     todo_item = get_object_or_404(TodoItem, id=todo_id, user=request.user)  # Fetch the todo item
@@ -72,11 +72,11 @@ def edit_personal_todo_item(request, user_id, todo_id):
     else:
         form = TodoItemForm(instance=todo_item)  # Create a form instance for GET requests
 
-    return render(request, 'edit_todo.html', {'form': form, 'user_id': user_id, 'todo_item': todo_item})
+    return render(request, 'personal/edit_todo.html', {'form': form, 'user_id': user_id, 'todo_item': todo_item})
 
 def delete_personal_todo_item(request, user_id):
     todo_items = TodoItem.objects.filter(user_id=user_id)
-    return render(request, 'deleteTodo.html', {'user_id': user_id, 'todo_items': todo_items})
+    return render(request, 'personal/delete_todo.html', {'user_id': user_id, 'todo_items': todo_items})
 
 def confirm_personal_bulk_delete(request, user_id):
     if request.method == 'POST':
@@ -98,7 +98,7 @@ def confirm_personal_bulk_delete(request, user_id):
 def team_todo_page(request, team_id):
     team = TodoTeam.objects.get(id=team_id)
     print(f"Users in team: {team.users.all()}")
-    return render(request, "team_todo_page.html", {"team_id":team_id, "team": team})
+    return render(request, "teams/team_todo_page.html", {"team_id":team_id, "team": team})
     
     
 #-----------------
@@ -117,7 +117,7 @@ def create_team(request):
     else:
         form = TodoTeamForm(current_user=request.user)
 
-    return render(request, "create_team.html", {"form": form})
+    return render(request, "teams/create_team.html", {"form": form})
 
 def edit_team(request, team_id):
     team = TodoTeam.objects.get(id=team_id)
@@ -129,7 +129,7 @@ def edit_team(request, team_id):
             return redirect(reverse('team_todo_page', kwargs={'team_id': team.id}))
     else:
         form = EditTodoTeamForm(instance=team)
-    return render(request, "edit_team.html", {"form": form, "team": team})
+    return render(request, "teams/edit_team.html", {"form": form, "team": team})
 
 def delete_team(request, team_id):
     team = TodoTeam.objects.get(id=team_id)
@@ -152,7 +152,7 @@ def todo_login(request):
             return redirect("personal_todo_page", user_id= user.id)
         else:
             messages.error(request, "Invalid email or password.")
-    return render(request, "login.html")
+    return render(request, "auth/login.html")
 
 def register(request):
     if request.method == "POST":
@@ -172,9 +172,9 @@ def register(request):
             return redirect("login")
         else:
             messages.error(request, "Invalid registration details.")
-            return render(request, "register.html", {"error": "Invalid registration details.", "form": form})
+            return render(request, "auth/register.html", {"error": "Invalid registration details.", "form": form})
     form = AccountRegistration()
-    return render(request, "register.html", {"form": form})
+    return render(request, "auth/register.html", {"form": form})
 
 def edit_profile(request):
     if request.method == "POST":
@@ -182,7 +182,7 @@ def edit_profile(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Profile updated successfully.")
-    return render(request, "edit_profile.html", {"form": EditProfileForm(instance=request.user)})
+    return render(request, "auth/edit_profile.html", {"form": EditProfileForm(instance=request.user)})
 
 
 def edit_password(request):
@@ -193,4 +193,4 @@ def edit_password(request):
             messages.success(
                 request, "Password updated successfully. Please log in again.")
             return redirect("login")
-    return render(request, "edit_password.html", {"form": EditPasswordForm(user=request.user)})
+    return render(request, "auth/edit_password.html", {"form": EditPasswordForm(user=request.user)})
