@@ -21,13 +21,19 @@
   <a href="{% url 'add_todo_item' %}" class="btn">+</a>
   <a href="{% url 'delete_todo_item' %}" class="btn btn-danger">Delete Item</a>
 
-  <!-- Category dropdown button -->
-  <select class="btn">
-    <option>Category</option>
-  </select>
+  <!-- Category Dropdown for filtering by task -->
+  <form method="GET" class="mb-3">
+    <select name="category" class="form-select">
+      <option value="All" {% if selected_category == "All" %}selected{% endif %}>All Categories</option>
+      {% for category in categories %}
+        <option value="{{ category }}" {% if selected_category == category %}selected{% endif %}>{{ category }}</option>
+      {% endfor %}
+    </select>
+    <button class="btn btn-outline-primary" type="submit">Filter</button>
+  </form>
 
-  <!-- Show Archive button -->
-  <a href="#" class="btn">Show Archive</a>
+  <!--archive button-->
+  <a href="?archive=true" class="btn">Archived</a>
 
   <div class="todo-grid">
     {% if todos %}
@@ -35,10 +41,10 @@
             <div class="card sticky-note" style="background-color: {% cycle '#fdfd96' '#ffb6b9' '#d4f1f4' '#ffcc99' %};">
                 <div class="card-body">
                     <h5 class="card-title">{{ todo.title }}</h5>
-                    <h6 class="card-subtitle mb-2 text-body-secondary">{{ todo.due_date }} - {{ todo.priority }}</h6>
+                    <h6 class="card-subtitle mb-2 text-body-secondary">{{ todo.due_date }} - {{ todo.completed }}</h6>
                     <p class="card-text">{{ todo.description }}</p>
                     <a href="{% url 'edit_todo' todo.id %}">Edit</a>
-                    {% if todo.completed %}
+                    {% if todo.completed >= 100.00 %}
                         <span style="color: green;">Completed</span>
                     {% else %}
                         <span style="color: red;">Not Completed</span>
