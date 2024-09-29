@@ -8,8 +8,9 @@ from django.core.mail import send_mail
 from django.contrib.auth import login, authenticate
 from django.views.generic.edit import FormView
 from django.contrib import messages
-from .models import TodoItem, TodoUser, TodoTeam
+from .models import TodoItem, TeamInvite, TodoTeam
 from .forms import EditTodoTeamForm, TodoItemForm, AccountRegistration, EditProfileForm, EditPasswordForm, TodoTeamForm
+from django.contrib.auth.decorators import login_required
 
 #-----------------
 #PERSONAL TODOLIST
@@ -121,8 +122,6 @@ def team_todo_page(request, team_id):
     team = TodoTeam.objects.get(id=team_id)
     print(f"Users in team: {team.users.all()}")
     return render(request, "teams/team_todo_page.html", {"team_id":team_id, "team": team})
-    
-    
 #-----------------
 #TEAM LOGIC
 #-----------------
@@ -141,6 +140,22 @@ def create_team(request):
 
     return render(request, "teams/create_team.html", {"form": form})
 
+def team_invite_confirmation(request, team_id, user_id):
+    if not request.user.is_authenticated:
+         return redirect(f"{reverse('login')}?next={request.path}")
+
+    invite = get_object_or_404(TeamInvite, team_id=team_id, invited_user_id=user_id)
+
+    if invite.is_accepted:
+        messages.error(request, "You have already accepted the invitation.")
+    else:
+        invite.is_accepted = True
+        invite.save()
+        team = invite.team
+        team.users.add(invite.invited_user)
+        messages.success(request, f"Invitation accepted. You are now a member of team {team.name}.")
+        return redirect(reverse('team_todo_page', kwargs={'team_id': team_id}))
+    
 def edit_team(request, team_id):
     team = TodoTeam.objects.get(id=team_id)
     if request.method == "POST":
@@ -160,21 +175,30 @@ def delete_team(request, team_id):
         team.delete()
         messages.success(request, f"Team {team.name} deleted successfully.")
         return redirect("personal_todo_page", user_id=request.user.id)
-    return render(request, "delete_team.html", {"team": team})
+    return render(request, "teams/delete_team.html", {"team": team})
 
 #AUTH
 
 def todo_login(request):
+    next_page = request.GET.get('next', '') 
+    
     if request.method == "POST":
         email = request.POST.get("email")
         password = request.POST.get("password")
         user = authenticate(request, email=email, password=password)
+        
         if user is not None:
             login(request, user)
-            return redirect("personal_todo_page", user_id= user.id)
+            
+            next_post = request.POST.get('next', '')
+            if next_post:
+                return redirect(next_post)
+            return redirect("personal_todo_page", user_id=user.id)
         else:
             messages.error(request, "Invalid email or password.")
-    return render(request, "auth/login.html")
+    
+    return render(request, "auth/login.html", {'next': next_page})
+
 
 
 def register(request):

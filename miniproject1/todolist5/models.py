@@ -135,4 +135,9 @@ class TodoItem(models.Model):
         return self.title
 
     class Meta:
-        ordering = ['due_date']
+        ordering=['due_date']
+
+class TeamInvite(models.Model):
+    team = models.ForeignKey(TodoTeam, on_delete=models.CASCADE)
+    invited_user = models.ForeignKey(TodoUser, on_delete=models.CASCADE)
+    is_accepted = models.BooleanField(default=False)

@@ -23,6 +23,7 @@ urlpatterns = [
      
      #TEAMS
      path('team/create_team/', views.create_team, name='create_team'),
+     path('team/<int:team_id>/<int:user_id>/invite/', views.team_invite_confirmation, name='confirm_invite'),
      path('team/<int:team_id>/edit_team/', views.edit_team, name='edit_team'),
      path("team/<int:team_id>/delete_team/", views.delete_team, name="delete_team"),
      

@@ -3,7 +3,29 @@
 {% if request.user.is_authenticated %}
 <h1>Create a Team</h1>
 <form method="post" action="{% url 'create_team' %}">{% csrf_token %}
-    {{ form.as_p }}
+    <div class="mb-3">
+        <label for="{{ form.name.id_for_label }}" class="form-label">Team Name</label>
+        {{ form.name }}
+    </div>
+
+    <div class="mb-3">
+        <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+        {{ form.description }}
+    </div>
+
+    <div class="mb-3">
+        <label for="users" class="form-label">Select Users</label>
+        <div class="card">
+            <div class="card-body">
+                {% for checkbox in form.users %}
+                    <div class="form-check">
+                        {{ checkbox.tag }}
+                        <label class="form-check-label" for="{{ checkbox.id_for_label }}">{{ checkbox.choice_label }}</label>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
     <button type="submit" class="btn btn-primary mb-3">Create Team</button>
 </form>
 {% else %}
