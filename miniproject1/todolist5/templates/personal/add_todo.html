@@ -15,7 +15,7 @@
         {{ form.as_p }}
         <button type="submit">Save</button>
     </form>
-    <a href="{% url 'todo_page' %}">Back to Todo Page</a>
+    <a href="{% url 'personal_todo_page' user_id=user.id %}">Back to Todo Page</a>
 </body>
 </html>
 {% endblock %}

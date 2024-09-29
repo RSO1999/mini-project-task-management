@@ -5,17 +5,10 @@ from . import models
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.forms import UserCreationForm, SetPasswordForm
 from django import forms
-from .models import TodoUser, TodoTeam
+from .models import TodoUser, TodoTeam, TeamInvite
 from django.core.mail import send_mail
-# class AccountRegistration(UserCreationForm):
-# email = forms.EmailField(label='Email')
-# username = forms.CharField(label='Username')
-# password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
-# assword2 = forms.CharField(label='Confirm Password', widget=forms.PasswordInput)
-
-# class Meta:
-# model = models.User
-# fields = ['email', 'username', 'password1', 'password2']
+from django.urls import reverse
+from django.conf import settings
 
 
 class AccountRegistration(UserCreationForm):
@@ -148,15 +141,22 @@ class TodoItemForm(forms.ModelForm):
         }
 
 class TodoTeamForm(forms.ModelForm):
+    users = forms.ModelMultipleChoiceField(
+        queryset=TodoUser.objects.all(),
+        widget=forms.CheckboxSelectMultiple(
+            attrs={
+                'class': 'form-check-input',
+            }
+        )
+    )
+   
     class Meta:
-        model = TodoTeam
+        model = TodoTeam 
         fields = ['name', 'description', 'users']
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': 'Enter team name', 'class': 'form-control'}),
             'description': forms.Textarea(attrs={'placeholder': 'Enter team description', 'class': 'form-control', 'rows': 3}),
-            'users': forms.SelectMultiple(attrs={'class': 'form-control'}),
         }
-
     def __init__(self, *args, **kwargs):
         self.current_user = kwargs.pop('current_user', None)
         super().__init__(*args, **kwargs)
@@ -176,16 +176,23 @@ class TodoTeamForm(forms.ModelForm):
             team.users.add(self.current_user)  
             
             for user in self.cleaned_data.get('users', []):
-                if user not in team.users.all():  
-                    team.users.add(user)
+                TeamInvite.objects.create(team=team, invited_user=user)
 
-            for user in self.cleaned_data['users']:
-                send_mail(
-                    'You have been invited to join a team on the Group 5 Todo App',
-                    f'You have been invited to join the team: {team.name}.',
-                    "csc394.group5@gmail.com",
-                    [user.email],
-                )
+                email_confirmation = reverse('confirm_invite', args=[team.id, user.id])
+                subject = f'You have been invited to join a team on the Group 5 Todo App'
+                message = f'You have been invited to join the team: {team.name}. Click the link to accept the invitation: http://localhost:8000{email_confirmation}'
+                send_mail(subject, message,settings.EMAIL_HOST_USER, [user.email]) 
+
         return team
+    
+class EditTodoTeamForm(forms.ModelForm):
+    class Meta:
+        model = TodoTeam
+        fields = ['name', 'description']
+        widgets = {
+            'name': forms.TextInput(attrs={'placeholder': 'Enter updated team name', 'class': 'form-control', 'default': {TodoTeam.name}}),
+            'description': forms.Textarea(attrs={'placeholder': 'Enter updated team description', 'class': 'form-control', 'rows': 3, 'default': {TodoTeam.description}}),
+        }
+
 
 

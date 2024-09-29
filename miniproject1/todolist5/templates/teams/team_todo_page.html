@@ -10,7 +10,9 @@
         {% endif %}
         {% endfor %}
     {% endif %}
-<button type="button" class="btn btn-warning" onclick=window.location.href="{% url 'edit_team' team_id=team.id %}">Edit Team</button>
+<div  class="d-flex justify-content-end">
+    <button type="button" class="btn btn-warning" onclick=window.location.href="{% url 'edit_team' team_id=team.id %}">Edit Team</button>
+</div>
 <div>
     <h1>{{team.name}} To-Do Page</h1>
     <p>{{team.description}}</p>
@@ -26,4 +28,5 @@
 </div>
 {% endif %}
 {% endblock %}
+
 
