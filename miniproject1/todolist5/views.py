@@ -21,12 +21,21 @@ def personal_todo_page(request, user_id):
     search_query = request.GET.get("todo_search", "")
     
     sort_by = request.GET.get('sort', 'due_date')
-    
-    todos = todos.filter(
-        models.Q(title__icontains=search_query) |
-        models.Q(description__icontains=search_query)
-    )
-    
+    selected_category = request.GET.get('category', 'All')
+    show_archive = request.GET.get('archive', 'false')
+
+    # search filter
+    if search_query:
+        todos = todos.filter(
+            models.Q(title__icontains=search_query) |
+            models.Q(description__icontains=search_query)
+        )
+
+    # category filter
+    if selected_category != 'All':
+        todos = todos.filter(category=selected_category)
+
+    # Apply sorting
     if sort_by == 'priority':
         todos = todos.order_by(
             Case(
@@ -38,11 +47,24 @@ def personal_todo_page(request, user_id):
         )
     else:
         todos = todos.order_by('due_date')
+
+    # filters for completed tasks when button is clicked
+    if show_archive == 'true':
+        todos = todos.filter(completed__gte=100.00)
+
+    # Filters by category
+    categories = TodoItem.objects.filter(
+        user=request.user).values_list('category', flat=True).distinct()
+
+    # Pass the sorted or filtered list of todoItems to the template
     context = {
         'user_id': user_id,
         'todos': todos,
         'sort_by': sort_by,
-        'search_query': search_query
+        'search_query': search_query,
+        'categories': categories,
+        'selected_category': selected_category,
+        'show_archive': show_archive,
     }
     return render(request, "personal/todo_page.html", context)
 
@@ -154,6 +176,7 @@ def todo_login(request):
             messages.error(request, "Invalid email or password.")
     return render(request, "auth/login.html")
 
+
 def register(request):
     if request.method == "POST":
         form = AccountRegistration(request.POST)
@@ -175,6 +198,7 @@ def register(request):
             return render(request, "auth/register.html", {"error": "Invalid registration details.", "form": form})
     form = AccountRegistration()
     return render(request, "auth/register.html", {"form": form})
+
 
 def edit_profile(request):
     if request.method == "POST":
