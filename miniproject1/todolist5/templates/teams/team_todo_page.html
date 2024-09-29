@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-{% if request.user.is_authenticated %}
+{% if request.user.is_authenticated and request.user in team.users.all%}
     {% if messages %}
         {% for message in messages %}
         {% if message.tags == 'success'%}
@@ -26,7 +26,94 @@
     {% endfor %}
     </ul>
 </div>
+
+<div class="btn-group mb-3">
+    <a href="?sort=due_date" class="btn btn-primary {% if sort_by == 'due_date' %}active{% endif %}">Sort by Due Date</a>
+    <a href="?sort=priority" class="btn btn-primary {% if sort_by == 'priority' %}active{% endif %}">Sort by Priority</a>
+</div>
+
+<form class="d-flex justify-content-end" role="search" method="GET">
+    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="todo_search" value="{{ request.GET.todo_search }}">
+    <input type="hidden" name="sort" value="{{ sort_by }}">
+    <button class="btn btn-outline-success" type="submit">Search</button>
+</form>
+<a href="{% url 'add_team_todo_item' team_id=team.id %}" class="btn">+</a>
+<a href="{% url 'delete_team_todo_item' team_id=team.id %}" class="btn btn-danger">Delete Item</a>
+
+<!-- Category Dropdown for filtering by task -->
+<form method="GET" class="mb-3">
+<select name="category" class="form-select">
+    <option value="All" {% if selected_category == "All" %}selected{% endif %}>All Categories</option>
+    {% for category in categories %}
+    <option value="{{ category }}" {% if selected_category == category %}selected{% endif %}>{{ category }}</option>
+    {% endfor %}
+</select>
+<button class="btn btn-outline-primary" type="submit">Filter</button>
+</form>
+
+<!--archive button-->
+<a href="?archive=true" class="btn">Archived</a>
+
+<div class="todo-grid">
+{% if todos %}
+    {% for todo in todos %}
+        <div class="card sticky-note" style="background-color: {% cycle '#fdfd96' '#ffb6b9' '#d4f1f4' '#ffcc99' %};">
+            <div class="card-body">
+                <h5 class="card-title">{{ todo.title }}</h5>
+                <h6 class="card-subtitle mb-2 text-body-secondary">{{ todo.category }} - {{ todo.priority }}</h6>
+                <h6 class="card-subtitle mb-2 text-body-secondary">{{ todo.due_date }} - {{ todo.completed }}</h6>
+                <p class="card-text">{{ todo.description }}</p>
+                <a href="{% url 'edit_team_todo_item' team_id=team.id todo_id=todo.id %}">Edit</a>
+                {% if todo.completed >= 100.0 %}
+                    <span style="color: green;">Completed</span>
+                {% else %}
+                    <span style="color: red;">Not Completed</span>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+    {% else %}
+        <p>No tasks</p>
+    {% endif %}
+  </div>
+
+{% else %}
+    <p>You are not authorized to access this page.</p>
 {% endif %}
+
+<style>
+  /* Grid layout */
+  .todo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px; 
+    padding: 20px;
+  }
+
+  /* Sticky note */
+  .sticky-note {
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ccc;
+    transition: transform 0.2s ease;
+    min-height: 200px;
+  }
+
+  .sticky-note:hover {
+    transform: translateY(-5px);
+  }
+
+  /* Button styling */
+  .btn {
+    background-color: grey;
+    color: white;
+    border: none;
+    border-radius: 7px;
+  }
+
+  body {
+    overflow-x: hidden;
+  }
+</style>
 {% endblock %}
-
-

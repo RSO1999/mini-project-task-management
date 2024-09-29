@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %} Edit To-Do Item for {{team.name}} {% endblock %}
+
+{% block content %}
+  <h2>Edit To-Do Item</h2>
+  <!--submits data to server-->
+  <form method="post">
+    {% csrf_token %}
+    {{form}}
+    <button type="submit">Save changes</button>
+    
+  </form>
+  <a href="{% url 'team_todo_page' team_id=team.id %}">Back to list</a>
+{% endblock %}

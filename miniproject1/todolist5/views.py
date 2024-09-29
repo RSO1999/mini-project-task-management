@@ -121,7 +121,106 @@ def confirm_personal_bulk_delete(request, user_id):
 def team_todo_page(request, team_id):
     team = TodoTeam.objects.get(id=team_id)
     print(f"Users in team: {team.users.all()}")
-    return render(request, "teams/team_todo_page.html", {"team_id":team_id, "team": team})
+
+    todos = TodoItem.objects.filter(team_id=team_id)
+    
+    search_query = request.GET.get("todo_search", "")
+    
+    sort_by = request.GET.get('sort', 'due_date')
+    selected_category = request.GET.get('category', 'All')
+    show_archive = request.GET.get('archive', 'false')
+
+    # search filter
+    if search_query:
+        todos = todos.filter(
+            models.Q(title__icontains=search_query) |
+            models.Q(description__icontains=search_query)
+        )
+
+    # category filter
+    if selected_category != 'All':
+        todos = todos.filter(category=selected_category)
+
+    # Apply sorting
+    if sort_by == 'priority':
+        todos = todos.order_by(
+            Case(
+                When(priority='H', then=1),
+                When(priority='M', then=2),
+                When(priority='L', then=3),
+                output_field=IntegerField()
+            )
+        )
+    else:
+        todos = todos.order_by('due_date')
+
+    # filters for completed tasks when button is clicked
+    if show_archive == 'true':
+        todos = todos.filter(completed__gte=100.00)
+
+    # Filters by category
+    categories = TodoItem.objects.filter(
+        team_id=team_id).values_list('category', flat=True).distinct()
+
+    # Pass the sorted or filtered list of todoItems to the template
+    context = {
+        'team': team,
+        'team_id': team_id,
+        'todos': todos,
+        'sort_by': sort_by,
+        'search_query': search_query,
+        'categories': categories,
+        'selected_category': selected_category,
+        'show_archive': show_archive,
+    }
+    return render(request, "teams/team_todo_page.html", context)
+
+def add_team_todo_item(request, team_id):
+    team = TodoTeam.objects.get(id=team_id)
+    if request.method == 'POST':
+        form = TodoItemForm(request.POST)
+        if form.is_valid():
+            todo_item = form.save(commit=False)
+            todo_item.team = team
+            todo_item.save()
+            messages.success(request, "To-do item added successfully!")
+            return redirect(reverse('team_todo_page', kwargs={'team_id': team.id}))
+    else:
+        form = TodoItemForm() 
+
+    return render(request, 'teams/team_add_todo.html', {'form': form, 'team_id': team_id, 'team': team})
+
+def edit_team_todo_item(request, team_id, todo_id):
+    team = TodoTeam.objects.get(id=team_id)
+    todo_item = get_object_or_404(TodoItem, id=todo_id, team=team)
+
+    if request.method == 'POST':
+        form = TodoItemForm(request.POST, instance=todo_item)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "To-do item updated successfully!")
+            return redirect(reverse('team_todo_page', kwargs={'team_id': team_id}))
+    else:
+        form = TodoItemForm(instance=todo_item) 
+    return render(request, 'teams/team_edit_todo.html', {'form': form, 'team_id': team_id, 'team': team, 'todo_item': todo_item})
+
+def delete_team_todo_item(request, team_id):
+    team = TodoTeam.objects.get(id=team_id)
+    todo_items = TodoItem.objects.filter(team_id=team_id)
+    return render(request, 'teams/team_delete_todo.html', {'team_id': team_id, 'team': team, 'todo_items': todo_items})
+
+def confirm_team_bulk_delete(request, team_id):
+    team = TodoTeam.objects.get(id=team_id)
+    if request.method == 'POST':
+        selected_items = request.POST.getlist('todo_ids')
+        if selected_items:
+            TodoItem.objects.filter(id__in=selected_items).delete()
+
+        return redirect(reverse('team_todo_page', kwargs={'team_id': team_id}))
+
+    return redirect(reverse('team_todo_page', kwargs={'team_id': team.id}))
+
+
 #-----------------
 #TEAM LOGIC
 #-----------------
