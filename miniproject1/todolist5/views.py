@@ -1,3 +1,4 @@
+from django.shortcuts import render
 from django.shortcuts import render, redirect, HttpResponse
 from django.views import View
 from django.urls import reverse_lazy
@@ -11,6 +12,7 @@ from django.contrib import messages
 from .models import TodoItem
 from .forms import TodoItemForm, AccountRegistration, EditProfileForm, EditPasswordForm
 
+
 class TodoItemUpdateView(UpdateView):
     model = TodoItem
     form_class = TodoItemForm
@@ -19,19 +21,26 @@ class TodoItemUpdateView(UpdateView):
     # Redirects back to the home page after edit
     success_url = reverse_lazy('todo_page')
 
+
 def todo_page(request):
-    # Filter todos based on the logged-in user
     todos = TodoItem.objects.filter(user=request.user)
 
-    # Retrieve search and sort parameters
+    # Retrieves parameters
     search_query = request.GET.get("todo_search", "")
     sort_by = request.GET.get('sort', 'due_date')
+    selected_category = request.GET.get('category', 'All')
+    show_archive = request.GET.get('archive', 'false')
 
-    # Apply search filter
-    todos = todos.filter(
-        models.Q(title__icontains=search_query) |
-        models.Q(description__icontains=search_query)
-    )
+    # search filter
+    if search_query:
+        todos = todos.filter(
+            models.Q(title__icontains=search_query) |
+            models.Q(description__icontains=search_query)
+        )
+
+    # category filter
+    if selected_category != 'All':
+        todos = todos.filter(category=selected_category)
 
     # Apply sorting
     if sort_by == 'priority':
@@ -46,13 +55,25 @@ def todo_page(request):
     else:
         todos = todos.order_by('due_date')
 
-    # Pass the sorted and filtered todos to the template
+    # filters for completed tasks when button is clicked
+    if show_archive == 'true':
+        todos = todos.filter(completed__gte=100.00)
+
+    # Filters by category
+    categories = TodoItem.objects.filter(
+        user=request.user).values_list('category', flat=True).distinct()
+
+    # Pass the sorted or filtered list of todoItems to the template
     context = {
         'todos': todos,
         'sort_by': sort_by,
-        'search_query': search_query
+        'search_query': search_query,
+        'categories': categories,
+        'selected_category': selected_category,
+        'show_archive': show_archive,
     }
     return render(request, "todo_page.html", context)
+
 
 def register(request):
     if request.method == "POST":
@@ -76,6 +97,7 @@ def register(request):
     form = AccountRegistration()
     return render(request, "register.html", {"form": form})
 
+
 def todo_login(request):
     if request.method == "POST":
         email = request.POST.get("email")
@@ -87,6 +109,7 @@ def todo_login(request):
         else:
             messages.error(request, "Invalid email or password.")
     return render(request, "login.html")
+
 
 def edit_profile(request):
     if request.method == "POST":
@@ -106,6 +129,7 @@ def edit_password(request):
                 request, "Password updated successfully. Please log in again.")
             return redirect("login")
     return render(request, "edit_password.html", {"form": EditPasswordForm(user=request.user)})
+
 
 class AddTodoItemView(FormView):
     template_name = 'add_todo_item.html'
