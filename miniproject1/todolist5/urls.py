@@ -19,11 +19,8 @@ urlpatterns = [
          views.personal_todo_page, name='personal_todo_page'),
     path('todos/<int:user_id>/add-todo/',
          views.add_personal_todo_item, name='add_personal_todo_item'),
-
-    # timer page
     path('todos/<int:user_id>/timer-todo/<int:todo_id>/',
          views.todo_timer, name="todo_timer"),
-
     path('todos/<int:user_id>/edit-todo/<int:todo_id>/',
          views.edit_personal_todo_item, name="edit_personal_todo_item"),
     path('todos/<int:user_id>/delete-todo/',

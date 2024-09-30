@@ -25,9 +25,7 @@ def personal_todo_page(request, user_id):
         return redirect("team_todo_page", team_id=team_id)
 
     todos = TodoItem.objects.filter(user_id=user_id)
-
     search_query = request.GET.get("todo_search", "")
-
     sort_by = request.GET.get('sort', 'due_date')
     selected_category = request.GET.get('category', 'All')
     show_archive = request.GET.get('archive', 'false')
@@ -103,12 +101,11 @@ def todo_timer(request, user_id, todo_id):
         elif 'stop_timer' in request.POST:
             todo_item.stop_timer()
 
-        # Redirect to the same view with user_id
         return redirect('todo_timer', user_id=user_id, todo_id=todo_id)
 
     return render(request, 'personal/todo_timer.html', {
         'todo_item': todo_item,
-        'user_id': user_id  # Ensure user_id is included in the context
+        'user_id': user_id
     })
 
 
@@ -145,10 +142,10 @@ def confirm_personal_bulk_delete(request, user_id):
 
     return redirect(reverse('personal_todo_page', kwargs={'user_id': request.user.id}))
 
-
 # -----------------
 # TEAM TODOLIST
 # -----------------
+
 
 def team_todo_page(request, team_id):
     team = TodoTeam.objects.get(id=team_id)
