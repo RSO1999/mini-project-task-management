@@ -1,28 +1,28 @@
 {% extends "base.html" %}
 {% block content %}
-{% if request.user.is_authenticated and request.user in team.users.all%}
+{% if request.user.is_authenticated and request.user in team.users.all %}
     {% if messages %}
         {% for message in messages %}
-        {% if message.tags == 'success'%}
+        {% if message.tags == 'success' %}
         <div class="alert alert-success" role="alert">
             {{ message }}
         </div>
         {% endif %}
         {% endfor %}
     {% endif %}
-<div  class="d-flex justify-content-end">
+<div class="d-flex justify-content-end">
     <button type="button" class="btn btn-warning" onclick=window.location.href="{% url 'edit_team' team_id=team.id %}">Edit Team</button>
 </div>
 <div>
-    <h1>{{team.name}} To-Do Page</h1>
-    <p>{{team.description}}</p>
+    <h1>{{ team.name }} To-Do Page</h1>
+    <p>{{ team.description }}</p>
 </div>
 
 <div>
     <h2>Team Members</h2>
     <ul>
     {% for user in team.users.all %}
-        <li>{{user.username}}</li>
+        <li>{{ user.username }}</li>
     {% endfor %}
     </ul>
 </div>
@@ -42,21 +42,21 @@
 
 <!-- Category Dropdown for filtering by task -->
 <form method="GET" class="mb-3">
-<select name="category" class="form-select">
-    <option value="All" {% if selected_category == "All" %}selected{% endif %}>All Categories</option>
-    {% for category in categories %}
-    <option value="{{ category }}" {% if selected_category == category %}selected{% endif %}>{{ category }}</option>
-    {% endfor %}
-</select>
-<button class="btn btn-outline-primary" type="submit">Filter</button>
+    <select name="category" class="form-select">
+        <option value="All" {% if selected_category == "All" %}selected{% endif %}>All Categories</option>
+        {% for category in categories %}
+        <option value="{{ category }}" {% if selected_category == category %}selected{% endif %}>{{ category }}</option>
+        {% endfor %}
+    </select>
+    <button class="btn btn-outline-primary" type="submit">Filter</button>
 </form>
 
-<!--archive button-->
+<!-- archive button -->
 <a href="?archive=true" class="btn">Archived</a>
 
 <div class="todo-grid">
-{% if todos %}
-    {% for todo in todos %}
+    {% if todos %}
+        {% for todo in todos %}
         <div class="card sticky-note" style="background-color: {% cycle '#fdfd96' '#ffb6b9' '#d4f1f4' '#ffcc99' %};">
             <div class="card-body">
                 <h5 class="card-title">{{ todo.title }}</h5>
@@ -71,20 +71,28 @@
                 {% endif %}
             </div>
         </div>
-    {% endfor %}
+        {% endfor %}
     {% else %}
         <p>No tasks</p>
     {% endif %}
-  </div>
+</div>
 
-  <form action="{% url 'delete_team_todo_list' team.id %}" method="POST">
+<!-- Delete all items button with confirmation -->
+<form id="delete-todo-form" action="{% url 'delete_team_todo_list' team.id %}" method="POST">
     {% csrf_token %}
-    <button type="submit" class="btn btn-danger">Delete All Items</button>
-  </form>
+    <button type="submit" class="btn btn-danger" onclick="return confirmDeletion()">Delete All Items</button>
+</form>
 
 {% else %}
     <p>You are not authorized to access this page.</p>
 {% endif %}
+
+<!-- JavaScript to handle the confirmation dialog -->
+<script type="text/javascript">
+    function confirmDeletion() {
+        return confirm("Are you sure you want to delete all items?");
+    }
+</script>
 
 <style>
   /* Grid layout */
