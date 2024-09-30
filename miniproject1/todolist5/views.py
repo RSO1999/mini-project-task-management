@@ -11,6 +11,9 @@ from django.contrib import messages
 from .models import TodoItem, TeamInvite, TodoTeam
 from .forms import EditTodoTeamForm, TodoItemForm, AccountRegistration, EditProfileForm, EditPasswordForm, TodoTeamForm
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+
 
 #-----------------
 #PERSONAL TODOLIST
@@ -217,7 +220,7 @@ def edit_team_todo_item(request, team_id, todo_id):
 def delete_team_todo_item(request, team_id):
     team = TodoTeam.objects.get(id=team_id)
     todo_items = TodoItem.objects.filter(team_id=team_id)
-    return render(request, 'teams/team_delete_todo.html', {'team_id': team_id, 'team': team, 'todo_items': todo_items})
+    return render(request, 'teams/team_todo_page.html', {'team_id': team_id, 'team': team, 'todo_items': todo_items})
 
 def confirm_team_bulk_delete(request, team_id):
     team = TodoTeam.objects.get(id=team_id)
@@ -229,6 +232,7 @@ def confirm_team_bulk_delete(request, team_id):
         return redirect(reverse('team_todo_page', kwargs={'team_id': team_id}))
 
     return redirect(reverse('team_todo_page', kwargs={'team_id': team.id}))
+
 
 
 #-----------------
@@ -285,6 +289,16 @@ def delete_team(request, team_id):
         messages.success(request, f"Team {team.name} deleted successfully.")
         return redirect("personal_todo_page", user_id=request.user.id)
     return render(request, "teams/delete_team.html", {"team": team})
+
+
+@csrf_exempt
+@login_required
+def delete_team_todo_list(request, user_id):
+    if request.method == 'POST':
+        TodoItem.objects.filter(user_id=user_id).delete()
+        return JsonResponse({'success': True})
+    return JsonResponse({'success': False})
+
 
 #AUTH
 
