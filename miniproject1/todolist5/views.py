@@ -218,7 +218,7 @@ def edit_team_todo_item(request, team_id, todo_id):
 def delete_team_todo_item(request, team_id):
     team = TodoTeam.objects.get(id=team_id)
     todo_items = TodoItem.objects.filter(team_id=team_id)
-    return render(request, 'teams/team_todo_page.html', {'team_id': team_id, 'team': team, 'todo_items': todo_items})
+    return render(request, 'teams/team_delete_todo.html', {'team_id': team_id, 'team': team, 'todo_items': todo_items})
 
 def confirm_team_bulk_delete(request, team_id):
     team = TodoTeam.objects.get(id=team_id)
@@ -290,11 +290,10 @@ def delete_team(request, team_id):
 
 
 
-def delete_team_todo_list(request, user_id):
-    if request.method == 'POST':
-        TodoItem.objects.filter(user_id=user_id).delete()
-        return JsonResponse({'success': True})
-    return JsonResponse({'success': False})
+def delete_team_todo_list(request, team_id):
+    team = TodoTeam.objects.get(id=team_id)
+    todo_items = TodoItem.objects.filter(team_id=team_id)
+    return render(request, 'teams/team_todo_page.html', {'team_id': team_id, 'team': team, 'todo_items': todo_items})
 
 
 #AUTH

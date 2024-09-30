@@ -76,6 +76,10 @@
         <p>No tasks</p>
     {% endif %}
   </div>
+  <form action="{% url 'delete_team_todo_list' team.id %}" method="POST"></form>
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Delete All</button>
+  </form>
 
 {% else %}
     <p>You are not authorized to access this page.</p>
