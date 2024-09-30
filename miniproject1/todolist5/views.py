@@ -292,16 +292,12 @@ def delete_team(request, team_id):
 
 def delete_team_todo_list(request, team_id):
     team = get_object_or_404(TodoTeam, id=team_id)
-    
     if request.method == 'POST':
-        # Delete all todo items for the team
         TodoItem.objects.filter(team_id=team_id).delete()
-        
-        # Re-render the same page with the updated list of items (empty after deletion)
         todo_items = TodoItem.objects.filter(team_id=team_id)
         return render(request, 'teams/team_todo_page.html', {'team_id': team_id, 'team': team, 'todo_items': todo_items})
-    
-    return HttpResponseForbidden("Invalid request.")
+    else:
+        return HttpResponseForbidden("Invalid request.")
 
 
 #AUTH
