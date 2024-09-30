@@ -34,6 +34,7 @@
   <a href="{% url 'add_personal_todo_item' user_id=user.id %}" class="btn">+</a>
   <a href="{% url 'delete_personal_todo_item' user_id=user.id %}" class="btn btn-danger">Delete Item</a>
 
+
   <!-- Category Dropdown for filtering by task -->
   <form method="GET" class="mb-3">
     <select name="category" class="form-select">
@@ -48,6 +49,8 @@
   <!--archive button-->
   <a href="?archive=true" class="btn">Archived</a>
 
+
+
   <div class="todo-grid">
     {% if todos %}
         {% for todo in todos %}
@@ -58,6 +61,8 @@
                     <h6 class="card-subtitle mb-2 text-body-secondary">{{ todo.due_date }} - {{ todo.completed }}</h6>
                     <p class="card-text">{{ todo.description }}</p>
                     <a href="{% url 'edit_personal_todo_item' user_id=user.id todo_id=todo.id %}">Edit</a>
+                    <a href="{% url 'todo_timer' user_id=user.id todo_id=todo.id %}">Timer</a>
+
                     {% if todo.completed >= 100.0 %}
                         <span style="color: green;">Completed</span>
                     {% else %}

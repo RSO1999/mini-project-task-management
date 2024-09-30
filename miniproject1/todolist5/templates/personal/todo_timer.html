@@ -1,0 +1,50 @@
+
+{% extends "base.html" %}
+{% block title %} Timer for To-Do Item {% endblock %}
+
+{% block content %}
+<h2>Timer for To-Do Item: {{ todo_item.title }}</h2>
+
+<div>
+    <p><strong>Total Duration:</strong> {{ todo_item.total_duration }}</p>
+</div>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" name="start_timer" class="btn btn-success">Start Timer</button>
+    <button type="submit" name="stop_timer" class="btn btn-danger">Stop Timer</button>
+</form>
+<div>
+  <a href="{% url 'personal_todo_page' user_id=user_id %}" class="btn btn-secondary">Back</a>
+</div>
+{% endblock %}
+
+<style>
+  /* Button styling */
+  .btn {
+    background-color: grey;
+    color: white;
+    border: none;
+    border-radius: 7px;
+    padding: 10px 15px;
+    text-decoration: none;
+    transition: background-color 0.3s;
+  }
+
+  .btn:hover {
+    background-color: darkgrey;
+  }
+
+  /* Timer display */
+  h2 {
+    color: #333;
+  }
+
+  /* Container for timer information */
+  div {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+  }
+</style>
