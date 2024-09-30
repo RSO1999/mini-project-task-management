@@ -13,7 +13,7 @@ from .forms import EditTodoTeamForm, TodoItemForm, AccountRegistration, EditProf
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-
+from django.http import HttpResponseForbidden
 
 #-----------------
 #PERSONAL TODOLIST
@@ -291,9 +291,14 @@ def delete_team(request, team_id):
 
 
 def delete_team_todo_list(request, team_id):
-    team = TodoTeam.objects.get(id=team_id)
-    todo_items = TodoItem.objects.filter(team_id=team_id)
-    return render(request, 'teams/team_todo_page.html', {'team_id': team_id, 'team': team, 'todo_items': todo_items})
+    if request.method == 'POST':
+        # Only allow POST requests for deletion
+        team = TodoTeam.objects.get(id=team_id)
+        TodoItem.objects.filter(team_id=team_id).delete()  # Delete all todo items for the team
+        return redirect('team_todo_page')  # Redirect to some page after deletion
+    else:
+        # Return forbidden if it's not a POST request
+        return HttpResponseForbidden("Invalid request.")
 
 
 #AUTH

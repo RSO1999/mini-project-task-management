@@ -76,9 +76,10 @@
         <p>No tasks</p>
     {% endif %}
   </div>
-  <form action="{% url 'delete_team_todo_list' team.id %}" method="POST"></form>
+
+  <form action="{% url 'delete_team_todo_list' team.id %}" method="POST">
     {% csrf_token %}
-    <button type="submit" class="btn btn-danger">Delete All</button>
+    <button type="submit" class="btn btn-danger">Delete All Items</button>
   </form>
 
 {% else %}
