@@ -291,8 +291,7 @@ def delete_team(request, team_id):
     return render(request, "teams/delete_team.html", {"team": team})
 
 
-@csrf_exempt
-@login_required
+
 def delete_team_todo_list(request, user_id):
     if request.method == 'POST':
         TodoItem.objects.filter(user_id=user_id).delete()
