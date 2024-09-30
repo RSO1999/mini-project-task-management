@@ -32,5 +32,7 @@ urlpatterns = [
      path('team/<int:team_id>/add-todo/', views.add_team_todo_item, name='add_team_todo_item'),
      path("team/<int:team_id>/edit-todo/<int:todo_id>/", views.edit_team_todo_item, name="edit_team_todo_item"),
      path('team/<int:team_id>/delete-todo/', views.delete_team_todo_item, name='delete_team_todo_item'),
-     path('team/<int:team_id>/confirm-todo-deletion/', views.confirm_team_bulk_delete, name='confirm_team_bulk_delete')
+     path('team/<int:team_id>/confirm-todo-deletion/', views.confirm_team_bulk_delete, name='confirm_team_bulk_delete'),
+     path('teams/<int:team_id>/delete/', views.delete_team_todo_list, name='delete_team_todo_list'),
+     
 ]
