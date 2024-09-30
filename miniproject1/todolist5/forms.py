@@ -1,4 +1,3 @@
-from django.http import Http400
 from .models import TodoUser, TodoItem
 from django import forms
 from .models import TodoItem
@@ -144,9 +143,6 @@ class TodoItemForm(forms.ModelForm):
             
             self.fields['assignee'].widget = forms.HiddenInput()
             self.fields['assignee'].widget.attrs['readonly'] = True
-            
-        else:
-            raise Http400("Neither team nor user provided")
             
         # adds calendar feature
         self.fields['due_date'].widget = forms.DateTimeInput(format=('%Y-%m-%dT%H:%M'), attrs={
