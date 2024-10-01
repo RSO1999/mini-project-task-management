@@ -11,6 +11,9 @@ from django.contrib import messages
 from .models import TodoItem, TeamInvite, TodoTeam
 from .forms import EditTodoTeamForm, TodoItemForm, AccountRegistration, EditProfileForm, EditPasswordForm, TodoTeamForm
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponseForbidden
 
 # -----------------
 # PERSONAL TODOLIST
@@ -253,10 +256,6 @@ def confirm_team_bulk_delete(request, team_id):
     return redirect(reverse('team_todo_page', kwargs={'team_id': team.id}))
 
 
-# -----------------
-# TEAM LOGIC
-# -----------------
-
 def create_team(request):
     if request.method == "POST":
         form = TodoTeamForm(request.POST, current_user=request.user)
@@ -314,7 +313,25 @@ def delete_team(request, team_id):
         return redirect("personal_todo_page", user_id=request.user.id)
     return render(request, "teams/delete_team.html", {"team": team})
 
-# AUTH
+
+def delete_team_todo_list(request, team_id):
+    team = get_object_or_404(TodoTeam, id=team_id)
+    if request.method == 'POST':
+        TodoItem.objects.filter(team_id=team_id).delete()
+        todo_items = TodoItem.objects.filter(team_id=team_id)
+        return render(request, 'teams/team_todo_page.html', {'team_id': team_id, 'team': team, 'todo_items': todo_items})
+    else:
+        return HttpResponseForbidden("Invalid request.")
+
+
+def delete_team_todo_list(request, team_id):
+    team = get_object_or_404(TodoTeam, id=team_id)
+    if request.method == 'POST':
+        TodoItem.objects.filter(team_id=team_id).delete()
+        todo_items = TodoItem.objects.filter(team_id=team_id)
+        return render(request, 'teams/team_todo_page.html', {'team_id': team_id, 'team': team, 'todo_items': todo_items})
+    else:
+        return HttpResponseForbidden("Invalid request.")
 
 
 def todo_login(request):

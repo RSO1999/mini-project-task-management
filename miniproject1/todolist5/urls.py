@@ -6,7 +6,6 @@ from . import views
 
 # http://localhost:8000/
 urlpatterns = [
-
     # AUTH/ACCOUNTS
     path("", views.todo_login, name="login"),
     path("register/", views.register, name="register"),
@@ -47,4 +46,5 @@ urlpatterns = [
          views.delete_team_todo_item, name='delete_team_todo_item'),
     path('team/<int:team_id>/confirm-todo-deletion/',
          views.confirm_team_bulk_delete, name='confirm_team_bulk_delete')
+
 ]
