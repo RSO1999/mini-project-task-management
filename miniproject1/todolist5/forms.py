@@ -115,42 +115,41 @@ class EditPasswordForm(SetPasswordForm):
 
 class TodoItemForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
-        
+
         team = kwargs.pop('team', None)
         user = kwargs.pop('user', None)
-        
+
         super(TodoItemForm, self).__init__(*args, **kwargs)
-        
-        
-        #FORMS require either a user or team to be passed in, based on what is sent, it will automatically set the appropriate values...
-        if team: 
-            self.fields.pop('user')  
-            
+
+        # FORMS require either a user or team to be passed in, based on what is sent, it will automatically set the appropriate values...
+        if team:
+            self.fields.pop('user')
+
             self.initial['team'] = team
-            
+
             self.fields['team'].widget = forms.HiddenInput()
             self.fields['team'].widget.attrs['readonly'] = True
-            
+
             self.fields['assignee'].queryset = team.users.all()
         elif user:
             self.fields.pop('team')
-            
+
             self.initial['user'] = user
             self.initial['assignee'] = user
-            
+
             self.fields['user'].widget = forms.HiddenInput()
             self.fields['user'].widget.attrs['readonly'] = True
-            
+
             self.fields['assignee'].widget = forms.HiddenInput()
             self.fields['assignee'].widget.attrs['readonly'] = True
-            
+
         # adds calendar feature
         self.fields['due_date'].widget = forms.DateTimeInput(format=('%Y-%m-%dT%H:%M'), attrs={
             'type': 'datetime-local',
             'class': 'form-control',
             'placeholder': 'Select Due Date'
         })
-        
+
         self.fields['reminder_date'].widget = forms.DateTimeInput(format=('%Y-%m-%dT%H:%M'), attrs={
             'type': 'datetime-local',
             'class': 'form-control',
@@ -165,6 +164,7 @@ class TodoItemForm(forms.ModelForm):
             'priority': forms.Select(choices=TodoItem.LEVEL_CHOICES),
         }
 
+
 class TodoTeamForm(forms.ModelForm):
     users = forms.ModelMultipleChoiceField(
         queryset=TodoUser.objects.all(),
@@ -174,19 +174,21 @@ class TodoTeamForm(forms.ModelForm):
             }
         )
     )
-   
+
     class Meta:
-        model = TodoTeam 
+        model = TodoTeam
         fields = ['name', 'description', 'users']
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': 'Enter team name', 'class': 'form-control'}),
             'description': forms.Textarea(attrs={'placeholder': 'Enter team description', 'class': 'form-control', 'rows': 3}),
         }
+
     def __init__(self, *args, **kwargs):
         self.current_user = kwargs.pop('current_user', None)
         super().__init__(*args, **kwargs)
         if self.current_user:
-            self.fields['users'].queryset = TodoUser.objects.exclude(id=self.current_user.id)
+            self.fields['users'].queryset = TodoUser.objects.exclude(
+                id=self.current_user.id)
 
     def clean_users(self):
         users = self.cleaned_data.get('users', [])
@@ -197,19 +199,22 @@ class TodoTeamForm(forms.ModelForm):
     def save(self, commit=True):
         team = super().save(commit=False)
         if commit:
-            team.save()  
-            team.users.add(self.current_user)  
-            
+            team.save()
+            team.users.add(self.current_user)
+
             for user in self.cleaned_data.get('users', []):
                 TeamInvite.objects.create(team=team, invited_user=user)
 
-                email_confirmation = reverse('confirm_invite', args=[team.id, user.id])
+                email_confirmation = reverse(
+                    'confirm_invite', args=[team.id, user.id])
                 subject = f'You have been invited to join a team on the Group 5 Todo App'
                 message = f'You have been invited to join the team: {team.name}. Click the link to accept the invitation: http://localhost:8000{email_confirmation}'
-                send_mail(subject, message,settings.EMAIL_HOST_USER, [user.email]) 
+                send_mail(subject, message,
+                          settings.EMAIL_HOST_USER, [user.email])
 
         return team
-    
+
+
 class EditTodoTeamForm(forms.ModelForm):
     class Meta:
         model = TodoTeam
@@ -218,6 +223,3 @@ class EditTodoTeamForm(forms.ModelForm):
             'name': forms.TextInput(attrs={'placeholder': 'Enter updated team name', 'class': 'form-control', 'default': {TodoTeam.name}}),
             'description': forms.Textarea(attrs={'placeholder': 'Enter updated team description', 'class': 'form-control', 'rows': 3, 'default': {TodoTeam.description}}),
         }
-
-
-

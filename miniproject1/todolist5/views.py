@@ -15,9 +15,10 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponseForbidden
 
-#-----------------
-#PERSONAL TODOLIST
-#-----------------
+# -----------------
+# PERSONAL TODOLIST
+# -----------------
+
 
 def personal_todo_page(request, user_id):
 
@@ -25,11 +26,9 @@ def personal_todo_page(request, user_id):
     team_id = request.GET.get('team_id', None)
     if team_id:
         return redirect("team_todo_page", team_id=team_id)
-    
+
     todos = TodoItem.objects.filter(user_id=user_id)
-    
     search_query = request.GET.get("todo_search", "")
-    
     sort_by = request.GET.get('sort', 'due_date')
     selected_category = request.GET.get('category', 'All')
     show_archive = request.GET.get('archive', 'false')
@@ -60,16 +59,14 @@ def personal_todo_page(request, user_id):
 
     # filters for completed tasks when button is clicked
     if show_archive == 'true':
-        todos = todos.filter(completed__gte=100.00)
+        todos = todos.filter(completed=100.00)
 
     # Filters by category
     categories = TodoItem.objects.filter(
         user=request.user).values_list('category', flat=True).distinct()
-    
-   
-    user_teams = TodoTeam.objects.filter(users = request.user)
 
-    
+    user_teams = TodoTeam.objects.filter(users=request.user)
+
     context = {
         'user_id': user_id,
         'todos': todos,
@@ -82,37 +79,61 @@ def personal_todo_page(request, user_id):
     }
     return render(request, "personal/todo_page.html", context)
 
+
 def add_personal_todo_item(request, user_id):
     if request.method == 'POST':
         form = TodoItemForm(request.POST, user=request.user)
         if form.is_valid():
             todo_item = form.save(commit=False)
-            todo_item.user = request.user 
+            todo_item.user = request.user
             todo_item.save()
             messages.success(request, "To-do item added successfully!")
             return redirect(reverse('personal_todo_page', kwargs={'user_id': request.user.id}))
     else:
-        form = TodoItemForm(user=request.user) 
+        form = TodoItemForm(user=request.user)
 
     return render(request, 'personal/add_todo.html', {'form': form, 'user_id': user_id})
+
+
+def todo_timer(request, user_id, todo_id):
+    todo_item = get_object_or_404(TodoItem, id=todo_id, user_id=user_id)
+
+    if request.method == 'POST':
+        if 'start_timer' in request.POST:
+            todo_item.start_timer()
+        elif 'stop_timer' in request.POST:
+            todo_item.stop_timer()
+
+        return redirect('todo_timer', user_id=user_id, todo_id=todo_id)
+
+    return render(request, 'personal/todo_timer.html', {
+        'todo_item': todo_item,
+        'user_id': user_id
+    })
+
 
 def edit_personal_todo_item(request, user_id, todo_id):
     todo_item = get_object_or_404(TodoItem, id=todo_id, user=request.user)
 
     if request.method == 'POST':
-        form = TodoItemForm(request.POST, instance=todo_item, user=request.user)  
+        form = TodoItemForm(
+            request.POST, instance=todo_item, user=request.user)
         if form.is_valid():
-            form.save()  
+            form.save()
             messages.success(request, "To-do item updated successfully!")
             return redirect(reverse('personal_todo_page', kwargs={'user_id': user_id}))
     else:
         form = TodoItemForm(instance=todo_item, user=request.user)
 
-    return render(request, 'personal/edit_todo.html', {'form': form, 'user_id': user_id, 'todo_item': todo_item})
+    return render(request, 'personal/edit_todo.html',
+                  {'form': form, 'user_id': user_id, 'todo_item': todo_item})
+
 
 def delete_personal_todo_item(request, user_id):
     todo_items = TodoItem.objects.filter(user_id=user_id)
-    return render(request, 'personal/delete_todo.html', {'user_id': user_id, 'todo_items': todo_items})
+    return render(request, 'personal/delete_todo.html',
+                  {'user_id': user_id, 'todo_items': todo_items})
+
 
 def confirm_personal_bulk_delete(request, user_id):
     if request.method == 'POST':
@@ -120,24 +141,23 @@ def confirm_personal_bulk_delete(request, user_id):
         if selected_items:
             TodoItem.objects.filter(id__in=selected_items).delete()
 
-        return redirect(reverse('personal_todo_page', kwargs={'user_id': request.user.id})) 
+        return redirect(reverse('personal_todo_page', kwargs={'user_id': request.user.id}))
 
     return redirect(reverse('personal_todo_page', kwargs={'user_id': request.user.id}))
-    
-    
-    
-#-----------------
-#TEAM TODOLIST
-#-----------------
+
+# -----------------
+# TEAM TODOLIST
+# -----------------
+
 
 def team_todo_page(request, team_id):
     team = TodoTeam.objects.get(id=team_id)
     print(f"Users in team: {team.users.all()}")
 
     todos = TodoItem.objects.filter(team_id=team_id)
-    
+
     search_query = request.GET.get("todo_search", "")
-    
+
     sort_by = request.GET.get('sort', 'due_date')
     selected_category = request.GET.get('category', 'All')
     show_archive = request.GET.get('archive', 'false')
@@ -168,7 +188,7 @@ def team_todo_page(request, team_id):
 
     # filters for completed tasks when button is clicked
     if show_archive == 'true':
-        todos = todos.filter(completed__gte=100.00)
+        todos = todos.filter(completed=100.00)
 
     # Filters by category
     categories = TodoItem.objects.filter(
@@ -186,6 +206,7 @@ def team_todo_page(request, team_id):
     }
     return render(request, "teams/team_todo_page.html", context)
 
+
 def add_team_todo_item(request, team_id):
     team = TodoTeam.objects.get(id=team_id)
     if request.method == 'POST':
@@ -197,9 +218,10 @@ def add_team_todo_item(request, team_id):
             messages.success(request, "To-do item added successfully!")
             return redirect(reverse('team_todo_page', kwargs={'team_id': team.id}))
     else:
-        form = TodoItemForm(team=team) 
+        form = TodoItemForm(team=team)
 
     return render(request, 'teams/team_add_todo.html', {'form': form, 'team_id': team_id, 'team': team})
+
 
 def edit_team_todo_item(request, team_id, todo_id):
     team = TodoTeam.objects.get(id=team_id)
@@ -212,13 +234,15 @@ def edit_team_todo_item(request, team_id, todo_id):
             messages.success(request, "To-do item updated successfully!")
             return redirect(reverse('team_todo_page', kwargs={'team_id': team_id}))
     else:
-        form = TodoItemForm(instance=todo_item, team=team) 
+        form = TodoItemForm(instance=todo_item, team=team)
     return render(request, 'teams/team_edit_todo.html', {'form': form, 'team_id': team_id, 'team': team, 'todo_item': todo_item})
+
 
 def delete_team_todo_item(request, team_id):
     team = TodoTeam.objects.get(id=team_id)
     todo_items = TodoItem.objects.filter(team_id=team_id)
     return render(request, 'teams/team_delete_todo.html', {'team_id': team_id, 'team': team, 'todo_items': todo_items})
+
 
 def confirm_team_bulk_delete(request, team_id):
     team = TodoTeam.objects.get(id=team_id)
@@ -232,30 +256,28 @@ def confirm_team_bulk_delete(request, team_id):
     return redirect(reverse('team_todo_page', kwargs={'team_id': team.id}))
 
 
-
-#-----------------
-#TEAM LOGIC
-#-----------------
-    
 def create_team(request):
     if request.method == "POST":
         form = TodoTeamForm(request.POST, current_user=request.user)
         if form.is_valid():
-            team = form.save() 
+            team = form.save()
             messages.success(request, "Team created successfully.")
-            return redirect(reverse('team_todo_page', kwargs={'team_id': team.id})) 
+            return redirect(reverse('team_todo_page', kwargs={'team_id': team.id}))
         else:
-            messages.error(request, "There was an error creating the team. Please check the form.")
+            messages.error(
+                request, "There was an error creating the team. Please check the form.")
     else:
         form = TodoTeamForm(current_user=request.user)
 
     return render(request, "teams/create_team.html", {"form": form})
 
+
 def team_invite_confirmation(request, team_id, user_id):
     if not request.user.is_authenticated:
-         return redirect(f"{reverse('login')}?next={request.path}")
+        return redirect(f"{reverse('login')}?next={request.path}")
 
-    invite = get_object_or_404(TeamInvite, team_id=team_id, invited_user_id=user_id)
+    invite = get_object_or_404(
+        TeamInvite, team_id=team_id, invited_user_id=user_id)
 
     if invite.is_accepted:
         messages.error(request, "You have already accepted the invitation.")
@@ -264,9 +286,11 @@ def team_invite_confirmation(request, team_id, user_id):
         invite.save()
         team = invite.team
         team.users.add(invite.invited_user)
-        messages.success(request, f"Invitation accepted. You are now a member of team {team.name}.")
+        messages.success(
+            request, f"Invitation accepted. You are now a member of team {team.name}.")
         return redirect(reverse('team_todo_page', kwargs={'team_id': team_id}))
-    
+
+
 def edit_team(request, team_id):
     team = TodoTeam.objects.get(id=team_id)
     if request.method == "POST":
@@ -279,6 +303,7 @@ def edit_team(request, team_id):
         form = EditTodoTeamForm(instance=team)
     return render(request, "teams/edit_team.html", {"form": form, "team": team})
 
+
 def delete_team(request, team_id):
     team = TodoTeam.objects.get(id=team_id)
     if request.method == "POST":
@@ -287,7 +312,6 @@ def delete_team(request, team_id):
         messages.success(request, f"Team {team.name} deleted successfully.")
         return redirect("personal_todo_page", user_id=request.user.id)
     return render(request, "teams/delete_team.html", {"team": team})
-
 
 
 def delete_team_todo_list(request, team_id):
@@ -300,28 +324,35 @@ def delete_team_todo_list(request, team_id):
         return HttpResponseForbidden("Invalid request.")
 
 
-#AUTH
+def delete_team_todo_list(request, team_id):
+    team = get_object_or_404(TodoTeam, id=team_id)
+    if request.method == 'POST':
+        TodoItem.objects.filter(team_id=team_id).delete()
+        todo_items = TodoItem.objects.filter(team_id=team_id)
+        return render(request, 'teams/team_todo_page.html', {'team_id': team_id, 'team': team, 'todo_items': todo_items})
+    else:
+        return HttpResponseForbidden("Invalid request.")
+
 
 def todo_login(request):
-    next_page = request.GET.get('next', '') 
-    
+    next_page = request.GET.get('next', '')
+
     if request.method == "POST":
         email = request.POST.get("email")
         password = request.POST.get("password")
         user = authenticate(request, email=email, password=password)
-        
+
         if user is not None:
             login(request, user)
-            
+
             next_post = request.POST.get('next', '')
             if next_post:
                 return redirect(next_post)
             return redirect("personal_todo_page", user_id=user.id)
         else:
             messages.error(request, "Invalid email or password.")
-    
-    return render(request, "auth/login.html", {'next': next_page})
 
+    return render(request, "auth/login.html", {'next': next_page})
 
 
 def register(request):
