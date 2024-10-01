@@ -40,11 +40,12 @@ urlpatterns = [
          views.team_todo_page, name='team_todo_page'),
     path('team/<int:team_id>/add-todo/',
          views.add_team_todo_item, name='add_team_todo_item'),
+    path('team/<int:team_id>/timer-todo/<int:todo_id>/',
+         views.team_todo_timer, name="team_todo_timer"),
     path("team/<int:team_id>/edit-todo/<int:todo_id>/",
          views.edit_team_todo_item, name="edit_team_todo_item"),
     path('team/<int:team_id>/delete-todo/',
          views.delete_team_todo_item, name='delete_team_todo_item'),
     path('team/<int:team_id>/confirm-todo-deletion/',
          views.confirm_team_bulk_delete, name='confirm_team_bulk_delete')
-
 ]
