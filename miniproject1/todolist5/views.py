@@ -223,6 +223,24 @@ def add_team_todo_item(request, team_id):
     return render(request, 'teams/team_add_todo.html', {'form': form, 'team_id': team_id, 'team': team})
 
 
+def team_todo_timer(request, team_id, todo_id):
+    team = TodoTeam.objects.get(id=team_id)
+    todo_item = get_object_or_404(TodoItem, id=todo_id, team=team)
+
+    if request.method == 'POST':
+        if 'start_timer' in request.POST:
+            todo_item.start_timer()
+        elif 'stop_timer' in request.POST:
+            todo_item.stop_timer()
+
+        return redirect('team_todo_timer', team_id=team_id, todo_id=todo_id)
+
+    return render(request, 'teams/team_todo_timer.html', {
+        'todo_item': todo_item,
+        'team_id': team_id
+    })
+
+
 def edit_team_todo_item(request, team_id, todo_id):
     team = TodoTeam.objects.get(id=team_id)
     todo_item = get_object_or_404(TodoItem, id=todo_id, team=team)

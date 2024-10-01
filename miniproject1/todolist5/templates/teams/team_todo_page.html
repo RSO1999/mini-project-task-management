@@ -64,6 +64,8 @@
                 <h6 class="card-subtitle mb-2 text-body-secondary">{{ todo.due_date }} - {{ todo.completed }}</h6>
                 <p class="card-text">{{ todo.description }}</p>
                 <a href="{% url 'edit_team_todo_item' team_id=team.id todo_id=todo.id %}">Edit</a>
+                <a href="{% url 'team_todo_timer' team_id=team.id todo_id=todo.id %}">Timer</a>
+
                 {% if todo.completed >= 100.0 %}
                     <span style="color: green;">Completed</span>
                 {% else %}
@@ -78,7 +80,7 @@
 </div>
 
 <!-- Delete all items button with confirmation -->
-<form id="delete-todo-form" action="{% url 'delete_team_todo_list' team.id %}" method="POST">
+<form id="delete-todo-form" action="{% url 'confirm_team_bulk_delete' team.id %}" method="POST">
     {% csrf_token %}
     <button type="submit" class="btn btn-danger" onclick="return confirmDeletion()">Delete All Items</button>
 </form>
